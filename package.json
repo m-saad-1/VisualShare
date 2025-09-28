@@ -1,0 +1,26 @@
+{
+  "name": "fashion-store-hcj",
+  "version": "1.0.0",
+  "description": "This is Men Fashion Hub",
+  "main": "node.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/m-saad-1/Men-Fashion-Hub.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/m-saad-1/Men-Fashion-Hub/issues"
+  },
+  "homepage": "https://github.com/m-saad-1/Men-Fashion-Hub#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.1",
+    "express": "^5.1.0",
+    "stripe": "^18.4.0"
+  }
+}

@@ -1,0 +1,10 @@
+# Large images
+images/jacket.jpg
+images/hero-banner.jpg
+images/shirt.jpg
+
+# Dependencies
+node_modules/
+
+# Environment variables
+.env

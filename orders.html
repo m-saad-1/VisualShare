@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FashionHub - My Orders</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+       :root {
+    --primary-color: #2a2a2a;
+    --secondary-color: #d4a762;
+    --accent-color: #e53935;
+    --text-color: #333;
+    --light-text: #777;
+    --border-color: #e0e0e0;
+    --bg-light: #f9f9f9;
+    --white: #fff;
+    --black: #000;
+    --success-color: #4caf50;
+    --warning-color: #ff9800;
+    --error-color: #f44336;
+    --font-main: 'Roboto', sans-serif;
+    --font-heading: 'Playfair Display', serif;
+    --transition: all 0.3s ease;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-main);
+    color: var(--text-color);
+    line-height: 1.6;
+    background-color: var(--bg-light);
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+.container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 15px;
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: var(--primary-color);
+}
+
+h1 {
+    font-size: 2.5rem;
+}
+
+h2 {
+    font-size: 2rem;
+}
+
+h3 {
+    font-size: 1.75rem;
+}
+
+p {
+    margin-bottom: 1rem;
+}
+
+/* Buttons */
+.btn {
+    display: inline-block;
+    padding: 10px 20px;
+    border-radius: 4px;
+    font-weight: 500;
+    text-align: center;
+    cursor: pointer;
+    transition: var(--transition);
+    border: 1px solid transparent;
+}
+
+.btn-primary {
+    background-color: var(--secondary-color);
+    color: var(--white);
+}
+
+.btn-primary:hover {
+    background-color: #c49555;
+}
+
+.btn-outline {
+    background-color: transparent;
+    border-color: var(--secondary-color);
+    color: var(--secondary-color);
+}
+
+.btn-outline:hover {
+    background-color: var(--secondary-color);
+    color: var(--white);
+}
+
+.btn-text {
+    background: none;
+    border: none;
+    color: var(--secondary-color);
+    padding: 0;
+}
+
+.btn-block {
+    display: block;
+    width: 100%;
+}
+
+.btn-small {
+    padding: 5px 10px;
+    font-size: 0.9rem;
+}
+        /* Header Styles */
+        .main-header {
+            background-color: var(--white);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+        }
+
+        .logo a {
+            font-family: var(--font-heading);
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .mobile-menu-toggle {
+            display: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .search-box {
+            display: flex;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .search-box input {
+            border: none;
+            padding: 8px 12px;
+            min-width: 200px;
+            outline: none;
+        }
+
+        .search-box button {
+            background: none;
+            border: none;
+            padding: 0 10px;
+            cursor: pointer;
+            background-color: var(--bg-light);
+        }
+
+        .user-actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        .user-actions a {
+            font-size: 1.2rem;
+            color: var(--primary-color);
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .cart-count,
+        .wishlist-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background-color: var(--secondary-color);
+            color: var(--white);
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Main Navigation */
+.main-nav {
+    border-top: 1px solid var(--border-color);
+}
+
+.main-nav ul {
+    display: flex;
+    list-style: none;
+}
+
+.main-nav li {
+    position: relative;
+}
+
+.main-nav > ul > li > a {
+    display: block;
+    padding: 15px 20px;
+    font-weight: 500;
+    transition: var(--transition);
+}
+
+.main-nav > ul > li > a:hover {
+    color: var(--secondary-color);
+}
+
+        /* Mega Menu Styles */
+        .mega-menu {
+            position: absolute;
+            left: 0;
+            width: 100vw;
+            margin-left: calc(-23vw + 50%);
+            background-color: var(--white);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            padding: 30px 0;
+            display: none;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .mega-menu-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 30px;
+        }
+
+        .mega-menu-trigger:hover .mega-menu,
+        .mega-menu-trigger:focus-within .mega-menu {
+            display: block;
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .mega-menu-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 40px;
+        }
+
+        .mega-menu-col {
+            min-width: 200px;
+        }
+
+        .mega-menu-col h4 {
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--primary-color);
+            white-space: nowrap;
+        }
+
+        .mega-menu-col ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .mega-menu-col li {
+            margin-bottom: 10px;
+            white-space: nowrap;
+        }
+
+        .mega-menu-col a {
+            display: block;
+            padding: 6px 0;
+            color: var(--light-text);
+            transition: var(--transition);
+            margin-right: 1rem;
+        }
+
+        .mega-menu-col a:hover {
+            color: var(--secondary-color);
+            padding-left: 5px;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 992px) {
+            .mobile-menu-toggle {
+                display: block;
+            }
+            
+            .main-nav {
+                position: fixed;
+                top: 70px;
+                left: 0;
+                right: 0;
+                background-color: var(--white);
+                max-height: 0;
+                overflow: hidden;
+                transition: max-height 0.3s ease;
+            }
+            
+            .main-nav.active {
+                max-height: 500px;
+            }
+            
+            .main-nav ul {
+                flex-direction: column;
+                padding: 15px;
+            }
+            
+            .mega-menu {
+                position: static;
+                width: 100%;
+                margin-left: 0;
+                box-shadow: none;
+                display: none;
+                padding: 15px 0 0 20px;
+            }
+            
+            .mega-menu-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+        }
+
+        /* Orders Page Styles */
+        .orders-page {
+            padding: 40px 0;
+        }
+        
+        .page-header {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .page-header h1 {
+            font-size: 32px;
+            color: #2a5c8d;
+            margin-bottom: 10px;
+        }
+        
+        /* Orders List */
+        .orders-list {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .order-card {
+            background: #fff;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+            border: 1px solid #eee;
+        }
+        
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .order-number {
+            font-weight: 600;
+            color: #2a5c8d;
+        }
+        
+        .order-date {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .order-status {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+        
+        .status-processing {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-shipped {
+            background-color: #d1ecf1;
+            color: #0c5460;
+        }
+        
+        .status-delivered {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .status-cancelled {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        .order-details {
+            display: flex;
+            margin-bottom: 15px;
+        }
+        
+        .order-summary {
+            flex: 1;
+        }
+        
+        .order-summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        
+        .order-summary-label {
+            color: #666;
+        }
+        
+        .order-summary-value {
+            font-weight: 500;
+        }
+        
+        .order-items {
+            margin-top: 15px;
+        }
+        
+        .order-item {
+            display: flex;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .order-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        
+        .order-item-image {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-right: 15px;
+        }
+        
+        .order-item-details {
+            flex: 1;
+        }
+        
+        .order-item-name {
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+        
+        .order-item-price {
+            color: #666;
+        }
+        
+        .order-item-quantity {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .order-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+        
+        .empty-orders {
+            text-align: center;
+            padding: 40px 0;
+        }
+        
+        .empty-orders-icon {
+            font-size: 60px;
+            color: #ddd;
+            margin-bottom: 20px;
+        }
+        
+        .empty-orders-message {
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+                /* Footer */
+.main-footer {
+    background-color: var(--primary-color);
+    color: var(--white);
+    padding: 60px 0 0;
+}
+
+.footer-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 30px;
+    margin-bottom: 40px;
+}
+
+.footer-col h3 {
+    color: var(--white);
+    margin-bottom: 20px;
+    font-size: 1.2rem;
+}
+
+.footer-col ul {
+    list-style: none;
+}
+
+.footer-col li {
+    margin-bottom: 10px;
+}
+
+.footer-col a {
+    color: #ccc;
+    transition: var(--transition);
+}
+
+.footer-col a:hover {
+    color: var(--secondary-color);
+}
+
+.newsletter-form {
+    display: flex;
+    margin-top: 15px;
+}
+
+.newsletter-form input {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 4px 0 0 4px;
+    outline: none;
+}
+
+.newsletter-form button {
+    background-color: var(--secondary-color);
+    color: var(--white);
+    border: none;
+    padding: 0 15px;
+    border-radius: 0 4px 4px 0;
+    cursor: pointer;
+}
+
+.social-links {
+    display: flex;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.social-links a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 35px;
+    height: 35px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    color: var(--white);
+    transition: var(--transition);
+}
+
+.social-links a:hover {
+    background-color: var(--secondary-color);
+}
+
+.footer-bottom {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 20px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.payment-methods {
+    display: flex;
+    gap: 10px;
+}
+
+.payment-methods img {
+    height: 25px;
+    width: auto;
+}
+    </style>
+</head>
+<body>
+  <header class="main-header">
+        <div class="container">
+            <div class="header-top">
+                <div class="logo">
+                    <a href="index.html">FashionHub</a>
+                </div>
+                <div class="mobile-menu-toggle">
+                    <i class="fas fa-bars"></i>
+                </div>
+                <div class="header-actions">
+                    <div class="search-box">
+                        <input type="text" placeholder="Search products...">
+                        <button><i class="fas fa-search"></i></button>
+                    </div>
+                    <div class="user-actions">
+                        <a href="account.html"><i class="far fa-user"></i></a>
+                        <a href="account.html#wishlist" class="wishlist-icon">
+                            <i class="far fa-heart"></i>
+                            <span class="wishlist-count">0</span>
+                        </a>
+                        <a href="cart.html" class="cart-icon">
+                            <i class="fas fa-shopping-bag"></i>
+                            <span class="cart-count">0</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="shop.html">Shop</a></li>
+                    <li class="mega-menu-trigger">
+                        <a href="#" class="mega-menu-link">Categories <i class="fas fa-chevron-down"></i></a>
+                        <div class="mega-menu">
+                            <div class="mega-menu-container">
+                                <div class="mega-menu-grid">
+                                    <div class="mega-menu-col">
+                                        <h4>Men's Fashion</h4>
+                                        <ul>
+                                            <li><a href="shop.html?category=shirts">Shirts</a></li>
+                                            <li><a href="shop.html?category=t-shirts">T-Shirts</a></li>
+                                            <li><a href="shop.html?category=jeans">Jeans</a></li>
+                                            <li><a href="shop.html?category=jackets">Jackets</a></li>
+                                        </ul>
+                                    </div>
+                                    <div class="mega-menu-col">
+                                        <h4>Women's Fashion</h4>
+                                        <ul>
+                                            <li><a href="shop.html?category=dresses">Dresses</a></li>
+                                            <li><a href="shop.html?category=tops">Tops</a></li>
+                                            <li><a href="shop.html?category=skirts">Skirts</a></li>
+                                            <li><a href="shop.html?category=w-jeans">Jeans</a></li>
+                                        </ul>
+                                    </div>
+                                    <div class="mega-menu-col">
+                                        <h4>Accessories</h4>
+                                        <ul>
+                                            <li><a href="shop.html?category=watches">Watches</a></li>
+                                            <li><a href="shop.html?category=bags">Bags</a></li>
+                                            <li><a href="shop.html?category=hats">Hats</a></li>
+                                            <li><a href="shop.html?category=belts">Belts</a></li>
+                                        </ul>
+                                    </div>
+                                    <div class="mega-menu-col">
+                                        <h4>Featured</h4>
+                                        <ul>
+                                            <li><a href="shop.html?category=new-arrivals">New Arrivals</a></li>
+                                            <li><a href="shop.html?category=best-sellers">Best Sellers</a></li>
+                                            <li><a href="shop.html?category=sale">Sale</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="orders-page">
+        <div class="container">
+            <div class="page-header">
+                <h1>My Orders</h1>
+            </div>
+            
+            <div class="orders-list" id="orders-list">
+                <!-- Orders will be dynamically inserted here -->
+                <div class="empty-orders">
+                    <div class="empty-orders-icon">
+                        <i class="fas fa-box-open"></i>
+                    </div>
+                    <h3 class="empty-orders-message">You haven't placed any orders yet</h3>
+                    <a href="shop.html" class="btn btn-primary">Start Shopping</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+     <!-- Footer -->
+    <footer class="main-footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h3>Shop</h3>
+                    <ul>
+                        <li><a href="shop.html">All Products</a></li>
+                        <li><a href="#">New Arrivals</a></li>
+                        <li><a href="#">Best Sellers</a></li>
+                        <li><a href="#">Special Offers</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h3>Information</h3>
+                    <ul>
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms & Conditions</a></li>
+                        <li><a href="contact.html">Contact Us</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h3>Customer Service</h3>
+                    <ul>
+                        <li><a href="#">Shipping Policy</a></li>
+                        <li><a href="#">Returns & Exchanges</a></li>
+                        <li><a href="#">Size Guide</a></li>
+                        <li><a href="#">FAQs</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col newsletter">
+                    <h3>Subscribe to Newsletter</h3>
+                    <p>Get updates on new arrivals and special offers</p>
+                    <form class="newsletter-form">
+                        <input type="email" placeholder="Your email address">
+                        <button type="submit">Subscribe</button>
+                    </form>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-pinterest-p"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2023 FashionHub. All rights reserved.</p>
+                <div class="payment-methods">
+                    <i class="fab fa-cc-visa" title="Visa"></i>
+                    <i class="fab fa-cc-mastercard" title="Mastercard"></i>
+                    <i class="fab fa-cc-paypal" title="PayPal"></i>
+                    <i class="fab fa-cc-apple-pay" title="Apple Pay"></i>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize cart and wishlist counts
+            updateCartCount();
+            updateWishlistCount();
+
+            // Load orders from localStorage
+            const currentUser = JSON.parse(localStorage.getItem('currentUser')) || {};
+            const orders = currentUser.orders || [];
+            const ordersList = document.getElementById('orders-list');
+            
+            if (orders.length > 0) {
+                ordersList.innerHTML = '';
+                
+                // Sort orders by date (newest first)
+                orders.sort((a, b) => new Date(b.date) - new Date(a.date));
+                
+                orders.forEach(order => {
+                    const orderCard = document.createElement('div');
+                    orderCard.className = 'order-card';
+                    
+                    // Format date
+                    const orderDate = new Date(order.date);
+                    const formattedDate = orderDate.toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                    });
+                    
+                    // Determine status class
+                    let statusClass = '';
+                    switch(order.status.toLowerCase()) {
+                        case 'processing':
+                            statusClass = 'status-processing';
+                            break;
+                        case 'shipped':
+                            statusClass = 'status-shipped';
+                            break;
+                        case 'delivered':
+                            statusClass = 'status-delivered';
+                            break;
+                        case 'cancelled':
+                            statusClass = 'status-cancelled';
+                            break;
+                        default:
+                            statusClass = 'status-processing';
+                    }
+                    
+                    // Create order card HTML
+                    orderCard.innerHTML = `
+                        <div class="order-header">
+                            <div>
+                                <div class="order-number">Order #${order.id}</div>
+                                <div class="order-date">${formattedDate}</div>
+                            </div>
+                            <div class="order-status ${statusClass}">${order.status}</div>
+                        </div>
+                        <div class="order-details">
+                            <div class="order-summary">
+                                <div class="order-summary-row">
+                                    <span class="order-summary-label">Total:</span>
+                                    <span class="order-summary-value">$${order.total.toFixed(2)}</span>
+                                </div>
+                                <div class="order-summary-row">
+                                    <span class="order-summary-label">Payment Method:</span>
+                                    <span class="order-summary-value">${order.paymentMethod}</span>
+                                </div>
+                                <div class="order-summary-row">
+                                    <span class="order-summary-label">Payment Status:</span>
+                                    <span class="order-summary-value">${order.paymentStatus}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="order-items">
+                            ${order.items.map(item => `
+                                <div class="order-item">
+                                    <img src="${item.image || 'https://via.placeholder.com/80'}" alt="${item.name}" class="order-item-image">
+                                    <div class="order-item-details">
+                                        <div class="order-item-name">${item.name}</div>
+                                        <div class="order-item-price">$${item.price.toFixed(2)}</div>
+                                        <div class="order-item-quantity">Quantity: ${item.quantity}</div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div class="order-actions">
+                            <a href="order-confirmation.html?id=${order.id}" class="btn btn-outline">View Order Details</a>
+                        </div>
+                    `;
+                    
+                    ordersList.appendChild(orderCard);
+                });
+            }
+        });
+
+        // Update cart count in header
+        function updateCartCount() {
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            const cartCount = cart.reduce((total, item) => total + item.quantity, 0);
+            document.querySelectorAll('.cart-count').forEach(el => {
+                el.textContent = cartCount;
+                el.style.display = cartCount > 0 ? 'flex' : 'none';
+            });
+        }
+
+        // Update wishlist count in header
+        function updateWishlistCount() {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser')) || { wishlist: [] };
+            const wishlistCount = currentUser.wishlist.length;
+            document.querySelectorAll('.wishlist-count').forEach(el => {
+                el.textContent = wishlistCount;
+                el.style.display = wishlistCount > 0 ? 'flex' : 'none';
+            });
+        }
+    </script>
+</body>
+</html>
