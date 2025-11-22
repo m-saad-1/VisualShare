@@ -1,4 +1,7 @@
 {
+    "name": "your-name/content-upload",
+    "description": "A PHP application for uploading and managing visual content.",
+    "license": "proprietary",
     "require-dev": {
         "phpunit/phpunit": "^11.5",
         "phpstan/phpstan": "^2.1",
