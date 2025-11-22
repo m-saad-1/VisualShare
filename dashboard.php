@@ -372,10 +372,9 @@ body {
 
     .dashboard-container {
         max-width: 1000px;
-        padding: 1rem 0.5rem;
-        margin-top: -80px; /* Overlap the header */
-        position: relative;
-        z-index: 999; /* Lower than header's z-index of 1000 */
+        padding: 1.5rem 1rem;
+        margin-top: 1rem;
+        z-index: 999;
     }
 
     .profile-section, .content-section, .sidebar-section {
@@ -680,6 +679,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+    z-index: 2; /* Ensure it's above the image */
     opacity: 0;
     transition: var(--transition);
 }
@@ -745,6 +745,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+    cursor: pointer;
     background: var(--light-gray);
     border: none;
     cursor: pointer;
@@ -1352,12 +1353,10 @@ body {
 .tabs-content-wrapper .checkbox-custom { display: none; }
 .tabs-content-wrapper .content-card:hover .checkbox-custom,
 .tabs-content-wrapper .checkbox-select:checked ~ .checkbox-custom { display: block; }
-
 .content-card.selected {
     border: 2px solid var(--primary-color);
     box-shadow: 0 0 0 4px rgba(67, 97, 238, 0.2);
 }
-
 .uploader-info {
     display: flex;
     align-items: center;
@@ -1366,14 +1365,12 @@ body {
     font-size: 0.8rem;
     color: var(--gray-color);
 }
-
 .uploader-avatar {
     width: 20px;
     height: 20px;
     border-radius: 50%;
     object-fit: cover;
 }
-
 .uploader-avatar-initials {
     width: 20px;
     height: 20px;
@@ -1386,13 +1383,11 @@ body {
     color: white;
     background: var(--primary-color);
 }
-
 .bulk-delete-btn {
     background: #ffffff !important;
     color: var(--danger-color) !important;
     border: 1px solid var(--danger-color) !important;
 }
-
 .bulk-delete-btn:hover {
     background: var(--danger-color) !important;
     color: white !important;
@@ -1402,6 +1397,7 @@ body {
     .dashboard-container {
         max-width: 100%;
         padding: 0.75rem 0.25rem;
+        margin-top: 0.5rem; /* Further reduced gap for smaller screens */
     }
 
     .profile-section, .content-section, .sidebar-section {
@@ -1465,25 +1461,11 @@ body {
     }
 
     .search-filter-container {
-        flex-direction: row;
-        gap: 0.5rem;
-        flex-wrap: nowrap;
-    }
-
-    .search-box {
-        flex: 2;
-        min-width: 0;
+        flex-wrap: wrap; /* Allow items to wrap */
     }
 
     .search-box input {
         padding: 0.6rem 0.8rem 0.6rem 35px;
-        font-size: 0.9rem;
-    }
-
-    .filter-select {
-        flex: 1;
-        min-width: 0;
-        padding: 0.6rem 0.8rem;
         font-size: 0.9rem;
     }
 
@@ -1514,56 +1496,6 @@ body {
         border-radius: 6px; /* Assuming this is the default border-radius for buttons */
         padding: 10px 16px; /* Restore original padding */
     }
-}
-
-@media (max-width: 500px) {
-
-.search-filter-container {
-
-flex-direction: column;
-
-gap: 10px;
-
-padding: 0 1rem; /* Equal spacing on both sides */
-
-box-sizing: border-box; /* Include padding in width */
-
-}
-
-.search-box {
-
-width: 100%;
-
-min-width: 100%;
-
-}
-
-.search-box input {
-
-width: 100%;
-
-}
-
-.filter-select-wrapper {
-
-display: flex;
-
-justify-content: space-between;
-
-width: 100%;
-
-gap: 1rem;
-
-}
-
-.filter-select-wrapper select.filter-select {
-
-flex: 1 1 0; /* Fill equally */
-
-min-width: 0;
-
-}
-
 }
 
 @media (max-width: 480px) {
@@ -1640,14 +1572,12 @@ min-width: 0;
         font-size: 14px;
     }
 
-    /* Keep primary buttons (Upload Now, Browse Content) normal shape below 500px */
     .btn-primary {
         width: auto !important;
         height: auto !important;
         border-radius: 6px !important;
         padding: 0.7rem 1.5rem !important;
     }
-
     .btn-primary span {
         display: inline !important;
     }
@@ -1667,25 +1597,25 @@ min-width: 0;
 
     .search-filter-container {
         flex-direction: column;
-        gap: 0.5rem;
+        gap: 0.75rem;
     }
 
-    .search-box, .filter-select {
+    .search-box {
         min-width: 100%;
     }
 
-    .search-box input {
-        padding: 0.6rem 1rem 0.6rem 35px;
-        font-size: 0.9rem;
+    .filter-select-wrapper {
+        display: flex;
+        gap: 0.75rem;
+        width: 100%;
     }
 
-    .filter-select {
-        padding: 0.6rem 1rem;
-        font-size: 0.9rem;
+    .filter-select-wrapper .filter-select {
+        flex: 1;
+        min-width: 0;
     }
 }
 
-/* Responsive remove button */
 @media (max-width: 500px) {
     .remove-text {
         display: none;
@@ -1694,7 +1624,6 @@ min-width: 0;
         display: inline;
     }
 }
-
 @media (min-width: 501px) {
     .remove-text {
         display: inline;
@@ -1706,10 +1635,10 @@ min-width: 0;
 
 .follow-actions .btn-follow-sm,
 .follow-actions .btn-remove {
-    border-radius: 4px !important; /* remove circle */
-    padding: 6px 12px !important; /* retain comfortable padding */
-    width: auto !important; /* let width be automatic */
-    height: auto !important; /* let height adjust as per padding */
+    border-radius: 4px !important;
+    padding: 6px 12px !important;
+    width: auto !important;
+    height: auto !important;
     min-width: unset !important;
 }
 
@@ -1755,7 +1684,6 @@ min-width: 0;
     color: #dc3545;
     border-color: #dc3545;
 }   
-/* Loading Overlay Styles */
     .loading-overlay {
         position: fixed;
         top: 0;
@@ -1770,7 +1698,6 @@ min-width: 0;
         transition: opacity 0.5s ease;
     }
 
-    /* From Uiverse.io by cosnametv */
     .loader {
         --color: #4361ee;
         --size: 70px;
@@ -1780,7 +1707,6 @@ min-width: 0;
         grid-template-columns: repeat(3, 1fr);
         gap: 5px;
     }
-
     .loader span {
         width: 100%;
         height: 100%;
@@ -1788,30 +1714,12 @@ min-width: 0;
         animation: keyframes-blink 0.6s alternate infinite linear;
     }
 
-    .loader span:nth-child(1) {
-        animation-delay: 0ms;
-    }
-
-    .loader span:nth-child(2) {
-        animation-delay: 200ms;
-    }
-
-    .loader span:nth-child(3) {
-        animation-delay: 300ms;
-    }
-
-    .loader span:nth-child(4) {
-        animation-delay: 400ms;
-    }
-
-    .loader span:nth-child(5) {
-        animation-delay: 500ms;
-    }
-
-    .loader span:nth-child(6) {
-        animation-delay: 600ms;
-    }
-
+    .loader span:nth-child(1) { animation-delay: 0ms; }
+    .loader span:nth-child(2) { animation-delay: 200ms; }
+    .loader span:nth-child(3) { animation-delay: 300ms; }
+    .loader span:nth-child(4) { animation-delay: 400ms; }
+    .loader span:nth-child(5) { animation-delay: 500ms; }
+    .loader span:nth-child(6) { animation-delay: 600ms; }
     @keyframes keyframes-blink {
         0% {
             opacity: 0.3;
@@ -1823,7 +1731,6 @@ min-width: 0;
             transform: scale(1);
         }
     }
-/* Tabs loading overlay (only for Your Uploads / Saved Items content area) */
 .tabs-content-wrapper { position: relative; }
 .tabs-loading-overlay {
     position: absolute;
@@ -1840,13 +1747,33 @@ min-width: 0;
 .tabs-loading-overlay .loading-spinner i { font-size: 2rem; color: #4361ee; margin-bottom: 10px; }
 .tabs-loading-overlay .loading-spinner p { font-size: 1rem; color: #555; }
 #tabsContent { transition: opacity 0.3s ease; }
+
+/* Skeleton loader for cards */
+.card-media .image-skeleton {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: skeletonShimmer 1.5s infinite linear;
+    z-index: 1;
+    transition: opacity 0.5s ease;
+}
+
+@keyframes skeletonShimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+.card-media img { opacity: 0; transition: opacity 0.5s ease; }
+.card-media img.loaded { opacity: 1; }
 </style>
 
 
 
-<!-- Loading overlay -->
 <div id="loading-overlay" class="loading-overlay">
-    <!-- From Uiverse.io by cosnametv -->
     <div class="loader">
         <span></span>
         <span></span>
@@ -1861,9 +1788,7 @@ min-width: 0;
     <div class="dashboard-layout">
         <!-- Main Content Column -->
         <div class="main-content">
-            <!-- Profile Section -->
             <section class="profile-section">
-                <!-- Moved actions to top right -->
                 <div class="profile-actions">
                     <a href="edit-profile.php" class="btn btn-edit">
                         <i class="fas fa-user-edit"></i>
@@ -1915,9 +1840,7 @@ min-width: 0;
                 </div>
             </section>
 
-            <!-- Content Section -->
             <section class="content-section">
-                <!-- Bulk Actions -->
                 <div class="bulk-actions" id="bulkActions">
                     <div class="bulk-count" id="bulkCount">0 items selected</div>
                     <button class="btn bulk-delete-btn" id="bulkDelete">
@@ -1931,7 +1854,6 @@ min-width: 0;
                 </div>
 
                 <div class="section-header">
-                    <!-- Content title and upload button moved to top -->
                     <div class="section-title-row">
                         <h2><i class="fas fa-photo-video"></i> Your Content</h2>
                         <a href="upload.php" class="btn btn-upload" id="uploadButton">
@@ -1940,7 +1862,6 @@ min-width: 0;
                         </a>
                     </div>
 
-                    <!-- View Toggle -->
                     <div class="view-toggle">
                         <button class="view-toggle-btn <?php echo !$show_saved ? 'active' : ''; ?>" 
                                 data-view="uploads" id="uploadsTab">
@@ -1952,7 +1873,6 @@ min-width: 0;
                         </button>
                     </div>
 
-                    <!-- Search and filters moved below -->
                     <div class="search-filter-container">
                         <div class="search-box">
                             <i class="fas fa-search"></i>
@@ -1973,7 +1893,6 @@ min-width: 0;
                     </div>
                 </div>
 
-                <!-- Content will be loaded here via AJAX -->
                 <div id="contentContainer" class="tabs-content-wrapper">
                     <div id="tabs-loading-overlay" class="tabs-loading-overlay">
                         <div class="loading-spinner">
@@ -1988,7 +1907,6 @@ min-width: 0;
 
         <!-- Right Sidebar Column -->
         <div class="sidebar">
-            <!-- Recent Activity Section -->
             <section class="sidebar-section">
                 <h3 class="sidebar-title"><i class="fas fa-bell"></i> Recent Activity</h3>
                 <div class="activity-list">
@@ -2025,7 +1943,6 @@ min-width: 0;
     </div>
 </div>
 
-<!-- Followers/Following Modal -->
 <div class="modal" id="followModal">
     <div class="modal-content follow-modal-content">
         <div class="modal-header">
@@ -2041,7 +1958,6 @@ min-width: 0;
     </div>
 </div>
 
-<!-- Edit Modal -->
 <div class="modal" id="editModal">
     <div class="modal-content">
         <div class="modal-header">
@@ -2063,16 +1979,25 @@ min-width: 0;
                     <label for="editTags" class="form-label">Tags (comma separated)</label>
                     <input type="text" id="editTags" name="tags" class="form-control" placeholder="tag1, tag2, tag3">
                 </div>
+                <div class="form-group">
+                    <label for="editFile" class="form-label">Change Media</label>
+                    <input type="file" id="editFile" name="file" class="form-control" accept="image/*,video/*">
+                    <small class="form-text">Leave empty to keep the current media.</small>
+                </div>
             </form>
         </div>
         <div class="modal-footer">
-            <button class="btn btn-secondary" onclick="closeModal('editModal')">Cancel</button>
-            <button class="btn btn-primary" onclick="saveContent()">Save Changes</button>
+            <button class="btn btn-secondary" id="editCancelBtn" onclick="closeModal('editModal')">Cancel</button>
+            <button class="btn btn-primary" id="editSaveBtn" onclick="saveContent()">
+                <span class="btn-text">Save Changes</span>
+                <span class="btn-loader" style="display: none;">
+                    <span class="progress-text"></span>
+                </span>
+            </button>
         </div>
     </div>
 </div>
 
-<!-- Unified Delete Modal -->
 <div class="modal" id="deleteModal">
     <div class="modal-content">
         <div class="modal-header">
@@ -2082,7 +2007,7 @@ min-width: 0;
         <div class="modal-body">
             <p id="deleteModalMessage">Are you sure you want to delete this content? This action cannot be undone.</p>
             <input type="hidden" id="deleteId">
-            <input type="hidden" id="deleteType" value="upload"> <!-- upload or saved -->
+            <input type="hidden" id="deleteType" value="upload">
         </div>
         <div class="modal-footer">
             <button class="btn btn-secondary" onclick="closeModal('deleteModal')">Cancel</button>
@@ -2091,7 +2016,6 @@ min-width: 0;
     </div>
 </div>
 
-<!-- Bulk Delete Modal -->
 <div class="modal" id="bulkDeleteModal">
     <div class="modal-content">
         <div class="modal-header">
@@ -2109,7 +2033,6 @@ min-width: 0;
     </div>
 </div>
 
-<!-- Unsave Confirmation Modal -->
 <div class="modal" id="unsaveModal">
     <div class="modal-content">
         <div class="modal-header">
@@ -2144,11 +2067,9 @@ min-width: 0;
 
 
 
-
 <script>
 // Loading overlay handling for dashboard (same behavior as index.php)
 document.addEventListener('DOMContentLoaded', function () {
-    // Hide loading overlay when page is fully loaded
     window.addEventListener('load', function() {
         const loadingOverlay = document.getElementById('loading-overlay');
         const container = document.querySelector('.dashboard-container');
@@ -2164,7 +2085,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // Fallback: hide overlay after 5 seconds
     setTimeout(function() {
         const loadingOverlay = document.getElementById('loading-overlay');
         const container = document.querySelector('.dashboard-container');
@@ -2189,7 +2109,6 @@ let totalPages = 1;
 let currentModalType = '';
 let currentModalUserId = 0;
 
-// Store button reference for unsave confirmation
 let unsaveButtonRef = null;
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -2204,10 +2123,8 @@ document.addEventListener('DOMContentLoaded', function() {
     <?php endif; ?>
     
 
-    // Load initial content
     loadContent(currentView, 1);
     
-    // Add event listeners for followers/following stats
     document.getElementById('followersStat').addEventListener('click', function() {
         openFollowModal('followers', <?php echo $user_id; ?>);
     });
@@ -2216,7 +2133,6 @@ document.addEventListener('DOMContentLoaded', function() {
         openFollowModal('following', <?php echo $user_id; ?>);
     });
     
-    // Tab switching
     document.getElementById('uploadsTab').addEventListener('click', function() {
         switchView('uploads');
     });
@@ -2225,7 +2141,6 @@ document.addEventListener('DOMContentLoaded', function() {
         switchView('saved');
     });
     
-    // Search and filter functionality
     const searchInput = document.getElementById('searchInput');
     const typeFilter = document.getElementById('typeFilter');
     const sortFilter = document.getElementById('sortFilter');
@@ -2234,7 +2149,6 @@ document.addEventListener('DOMContentLoaded', function() {
         loadContent(currentView, 1);
     }
     
-    // Debounce search input
     let searchTimeout;
     searchInput.addEventListener('input', function() {
         clearTimeout(searchTimeout);
@@ -2244,7 +2158,6 @@ document.addEventListener('DOMContentLoaded', function() {
     typeFilter.addEventListener('change', applyFilters);
     sortFilter.addEventListener('change', applyFilters);
     
-    // Bulk selection functionality
     const bulkActions = document.getElementById('bulkActions');
     const bulkCount = document.getElementById('bulkCount');
     const bulkDeleteBtn = document.getElementById('bulkDelete');
@@ -2303,14 +2216,11 @@ function loadContent(viewType, page) {
             return;
         }
         
-        // Update content count
         document.getElementById('contentCount').textContent = data.total_uploads;
         document.getElementById('contentLabel').textContent = viewType === 'saved' ? 'Saved Items' : 'Uploads';
         
-        // Show/hide upload button based on view
         document.getElementById('uploadButton').style.display = viewType === 'saved' ? 'none' : 'flex';
         
-        // Render content
         if (data.content.length > 0) {
             let html = '<div class="content-grid">';
             
@@ -2329,17 +2239,25 @@ function loadContent(viewType, page) {
                         ` : ''}
                         <div class="card-media">
                             ${is_video ? `
+                                <div class="image-skeleton"></div>
                                 ${thumbnail_path && thumbnail_path !== 'assets/video-thumbnail.jpg' ? 
-                                    `<img src="${thumbnail_path}" alt="Video thumbnail">` : 
+                                    `<img src="${thumbnail_path}" alt="Video thumbnail" loading="lazy" decoding="async" onload="this.classList.add('loaded'); this.previousElementSibling.style.opacity='0';">` : 
                                     `<div class="video-thumbnail-fallback"><i class="fas fa-play"></i></div>`
                                 }
                                 <div class="video-badge"><i class="fas fa-play"></i></div>
                             ` : `
-                                <img src="${display_path}" alt="${upload.title.replace(/"/g, '&quot;')}">
+                                <div class="image-skeleton"></div>
+                                <img src="${display_path}" 
+                                     alt="${upload.title.replace(/"/g, '&quot;')}" 
+                                     loading="lazy"
+                                     decoding="async" 
+                                     onload="this.classList.add('loaded'); this.previousElementSibling.style.opacity='0';"
+                                     onerror="this.previousElementSibling.style.opacity='0';"
+                                >
                             `}
                             <div class="card-hover-actions">
                                 <a href="view.php?id=${upload.id}" class="btn-view">
-                                    <i class="fas fa-expand"></i>
+                                    <i class="fas fa-eye"></i>
                                 </a>
                             </div>
                         </div>
@@ -2384,7 +2302,6 @@ function loadContent(viewType, page) {
                     </div>
                 `;
                 
-                // Store content data for modals
                 contentData[upload.id] = {
                     id: upload.id,
                     title: upload.title,
@@ -2396,7 +2313,6 @@ function loadContent(viewType, page) {
             
             html += '</div>';
             
-            // Add pagination if needed
             if (data.total_pages > 1) {
                 html += '<ul class="pagination">';
                 
@@ -2436,7 +2352,6 @@ function loadContent(viewType, page) {
             
             container.innerHTML = html;
             
-            // Set up checkbox event listeners
             document.querySelectorAll('.checkbox-select').forEach(checkbox => {
                 checkbox.addEventListener('change', function() {
                     const card = this.closest('.content-card');
@@ -2454,12 +2369,10 @@ function loadContent(viewType, page) {
                 });
             });
             
-            // Reset selection
             selectedItems = [];
             updateBulkActions();
             
         } else {
-            // No content found
             container.innerHTML = `
                 <div class="empty-state">
                     <div class="empty-icon">
@@ -2480,14 +2393,11 @@ function loadContent(viewType, page) {
             `;
         }
         
-        // Hide tabs overlay and fade in content
         if (tabsOverlay) {
             tabsOverlay.style.opacity = '0';
             setTimeout(function() { tabsOverlay.style.display = 'none'; }, 300);
         }
         container.style.opacity = '1';
-
-        // Update current page and total pages
         currentPage = data.current_page;
         totalPages = data.total_pages;
     })
@@ -2525,16 +2435,11 @@ function updateBulkActions() {
 }
 
 function switchView(viewType) {
-    // Update active tab
     document.querySelectorAll('.view-toggle-btn').forEach(btn => {
         btn.classList.remove('active');
     });
     document.querySelector(`.view-toggle-btn[data-view="${viewType}"]`).classList.add('active');
-
-    // Update current view
     currentView = viewType;
-
-    // Load content for the selected view
     loadContent(viewType, 1);
 }
 
@@ -2545,23 +2450,18 @@ function toggleFavorite(id, button, isSavedView = false) {
     const isFavorite = button.classList.contains('favorited');
     const action = isFavorite ? 'remove' : 'add';
 
-    // If removing from saved view, show confirmation modal
     if (isSavedView && action === 'remove') {
         document.getElementById('unsaveContentId').value = id;
-        // Store button reference for later use
         unsaveButtonRef = button;
         document.getElementById('unsaveModal').classList.add('active');
         return;
     }
-
-    // For adding favorites or removing from other views, proceed directly
     performFavoriteAction(id, button, action, isSavedView);
 }
 
 function performFavoriteAction(id, button, action, isSavedView = false) {
     const icon = button.querySelector('i');
 
-    // Show loading state
     const originalIcon = icon.className;
     icon.className = 'fas fa-spinner fa-spin';
 
@@ -2575,24 +2475,19 @@ function performFavoriteAction(id, button, action, isSavedView = false) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            // Toggle visual state
             button.classList.toggle('favorited');
             icon.className = button.classList.contains('favorited') ? 'fas fa-bookmark' : 'far fa-bookmark';
 
-            // If we're in the saved view and we're removing a favorite, remove the card
             if (isSavedView && action === 'unsave') {
                 const card = button.closest('.content-card');
                 if (card) {
                     card.style.opacity = '0';
                     setTimeout(() => {
                         card.remove();
-                        // Update the count
                         const stat = document.querySelector('.stat-card:first-child .stat-value');
                         if (stat) {
                             stat.textContent = parseInt(stat.textContent) - 1;
                         }
-
-                        // Check if we need to show empty state
                         if (document.querySelectorAll('.content-card').length === 0) {
                             showEmptyState();
                         }
@@ -2602,13 +2497,11 @@ function performFavoriteAction(id, button, action, isSavedView = false) {
 
             showAlert(data.message, 'success');
         } else {
-            // Revert to original state on error
             icon.className = originalIcon;
             showAlert(data.message || 'Failed to update favorite status', 'error');
         }
     })
     .catch(error => {
-        // Revert to original state on error
         icon.className = originalIcon;
         console.error('Error:', error);
         showAlert('An error occurred while updating favorite status', 'error');
@@ -2621,7 +2514,6 @@ function confirmUnsave() {
     if (contentId && unsaveButtonRef) {
         performFavoriteAction(contentId, unsaveButtonRef, 'unsave', true);
         closeModal('unsaveModal');
-        // Clear the button reference
         unsaveButtonRef = null;
     }
 }
@@ -2656,7 +2548,6 @@ function openEditModal(id, event) {
     }
 }
 
-// Open delete modal
 function openDeleteModal(id, type = 'upload', event) {
     if (event) event.stopPropagation();
     
@@ -2675,7 +2566,6 @@ function openDeleteModal(id, type = 'upload', event) {
     
     document.getElementById('deleteModal').classList.add('active');
 }
-// Process delete based on type
 function processDelete() {
     const id = document.getElementById('deleteId').value;
     const type = document.getElementById('deleteType').value;
@@ -2689,73 +2579,88 @@ function processDelete() {
 function closeModal(modalId) {
     document.getElementById(modalId).classList.remove('active');
 
-    // Clear button reference when unsave modal is closed
     if (modalId === 'unsaveModal') {
         unsaveButtonRef = null;
     }
 }
 
 function saveContent() {
+    const saveBtn = document.getElementById('editSaveBtn');
+    const cancelBtn = document.getElementById('editCancelBtn');
+    const btnText = saveBtn.querySelector('.btn-text');
+    const btnLoader = saveBtn.querySelector('.btn-loader');
+    const progressText = saveBtn.querySelector('.progress-text');
+
     const form = document.getElementById('editForm');
     const formData = new FormData(form);
-    const id = formData.get('id');
-    
-    // Convert FormData to JSON
-    const jsonData = {};
-    formData.forEach((value, key) => {
-        jsonData[key] = value;
-    });
-    
-    fetch('includes/update_content.php', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(jsonData)
-    })
-    .then(response => {
-        // First check if the response is JSON
-        const contentType = response.headers.get('content-type');
-        if (!contentType || !contentType.includes('application/json')) {
-            return response.text().then(text => {
-                throw new Error(`Invalid response: ${text}`);
-            });
+    const fileInput = document.getElementById('editFile');
+    const hasFile = fileInput.files.length > 0;
+
+    // UI updates for loading state
+    saveBtn.disabled = true;
+    cancelBtn.disabled = true;
+    btnText.style.display = 'none';
+    btnLoader.style.display = 'inline-flex';
+    progressText.textContent = hasFile ? '0%' : 'Saving...';
+
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', 'includes/update_content.php', true);
+
+    // Track upload progress
+    xhr.upload.onprogress = function(event) {
+        if (event.lengthComputable && hasFile) {
+            const percentComplete = Math.round((event.loaded / event.total) * 100);
+            progressText.textContent = percentComplete + '%';
         }
-        return response.json();
-    })
-    .then(data => {
-        if (data.success) {
-            // Update the content data
-            contentData[id].title = formData.get('title');
-            contentData[id].description = formData.get('description');
-            contentData[id].tags = formData.get('tags');
-            
-            // Update the card title
-            const card = document.querySelector(`.content-card[data-id="${id}"] .content-title`);
-            if (card) {
-                card.textContent = formData.get('title');
-                card.setAttribute('title', formData.get('title'));
+    };
+
+    // Handle completion
+    xhr.onload = function() {
+        // UI reset
+        saveBtn.disabled = false;
+        cancelBtn.disabled = false;
+        btnText.style.display = 'inline';
+        btnLoader.style.display = 'none';
+        progressText.textContent = '';
+
+        if (xhr.status >= 200 && xhr.status < 300) {
+            try {
+                const data = JSON.parse(xhr.responseText);
+                if (data.success) {
+                    closeModal('editModal');
+                    showAlert('Content updated successfully!', 'success');
+                    loadContent(currentView, currentPage); // Reload to show all changes
+                } else {
+                    showAlert(data.message || 'Failed to update content', 'error');
+                }
+            } catch (e) {
+                showAlert('An unexpected error occurred. Please check the server response.', 'error');
+                console.error("JSON Parse Error:", e);
+                console.error("Server Response:", xhr.responseText);
             }
-            
-            // Update tags if they exist
-            const tagContainer = document.querySelector(`.content-card[data-id="${id}"] .tag-list`);
-            if (tagContainer) {
-                const tags = formData.get('tags').split(',').filter(tag => tag.trim() !== '');
-                tagContainer.innerHTML = tags.map(tag => 
-                    `<a href="dashboard.php?tag=${encodeURIComponent(tag.trim())}" class="tag">${tag.trim()}</a>`
-                ).join('');
-            }
-            
-            closeModal('editModal');
-            showAlert('Content updated successfully!', 'success');
         } else {
-            showAlert(data.message || 'Failed to update content', 'error');
+            showAlert(`Error: ${xhr.statusText}`, 'error');
         }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        showAlert(`Error updating content: ${error.message}`, 'error');
-    });
+    };
+
+    // Handle network errors
+    xhr.onerror = function() {
+        saveBtn.disabled = false;
+        cancelBtn.disabled = false;
+        btnText.style.display = 'inline';
+        btnLoader.style.display = 'none';
+        progressText.textContent = '';
+        showAlert('A network error occurred. Please try again.', 'error');
+    };
+
+    // Show "Processing..." after upload completes
+    xhr.upload.onload = function() {
+        // This event fires after the file upload part is complete.
+        // We can show a "Processing..." message to the user.
+        progressText.textContent = 'Processing...';
+    };
+
+    xhr.send(formData);
 }
 
 function deleteContent(id = null) {
@@ -2771,13 +2676,11 @@ function deleteContent(id = null) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            // Remove the card from DOM
             const card = document.querySelector(`.content-card[data-id="${contentId}"]`);
             if (card) {
                 card.remove();
             }
             
-            // Update stats count
             const stat = document.querySelector('.stat-card:first-child .stat-value');
             if (stat) {
                 stat.textContent = parseInt(stat.textContent) - 1;
@@ -2794,11 +2697,9 @@ function deleteContent(id = null) {
         showAlert('An error occurred while deleting content', 'error');
     });
 }
-// Modified deleteSavedContent function
 function deleteSavedContent(id = null) {
     const contentId = id || document.getElementById('deleteId').value;
     
-    // Show loading state
     const deleteBtn = document.querySelector('#deleteModal .btn-logout');
     const originalText = deleteBtn.innerHTML;
     deleteBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Removing...';
@@ -2814,7 +2715,6 @@ function deleteSavedContent(id = null) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            // Remove the card from DOM
             const card = document.querySelector(`.content-card[data-id="${contentId}"]`);
             if (card) {
                 card.style.opacity = '0';
@@ -2824,13 +2724,11 @@ function deleteSavedContent(id = null) {
                 setTimeout(() => {
                     card.remove();
                     
-                    // Update the count
                     const stat = document.querySelector('.stat-card:first-child .stat-value');
                     if (stat) {
                         stat.textContent = parseInt(stat.textContent) - 1;
                     }
                     
-                    // Check if we need to show empty state
                     if (document.querySelectorAll('.content-card').length === 0) {
                         showEmptyState();
                     }
@@ -2848,7 +2746,6 @@ function deleteSavedContent(id = null) {
         showAlert('An error occurred while removing content', 'error');
     })
     .finally(() => {
-        // Restore button state
         deleteBtn.innerHTML = originalText;
         deleteBtn.disabled = false;
     });
@@ -2888,7 +2785,6 @@ function openFollowModal(type, userId) {
     
     fetch(`includes/get_${type}.php?user_id=${userId}`)
         .then(response => {
-            // Check if response is JSON
             const contentType = response.headers.get('content-type');
             if (!contentType || !contentType.includes('application/json')) {
                 return response.text().then(text => {
@@ -2900,7 +2796,6 @@ function openFollowModal(type, userId) {
         .then(data => {
             spinner.style.display = 'none';
             
-            // Check if we got an error response
             if (data.error) {
                 list.innerHTML = `<div class="no-follows">Error: ${data.error}</div>`;
                 return;
@@ -2920,16 +2815,13 @@ function openFollowModal(type, userId) {
                     item.className = 'follow-item';
                     item.setAttribute('data-user-id', user.id);
                     
-                    // Determine button text and class
                     let buttonText, buttonClass, isFollowing;
                     
                     if (type === 'followers') {
-                        // In followers modal, show "Follow Back" if not already following, otherwise "Following"
                         isFollowing = user.is_following;
                         buttonText = isFollowing ? 'Following' : 'Follow Back';
                         buttonClass = isFollowing ? 'btn-following' : 'btn-follow';
                     } else {
-                        // In following modal, always show "Following" (for unfollow)
                         isFollowing = true;
                         buttonText = 'Following';
                         buttonClass = 'btn-following';
@@ -2985,7 +2877,6 @@ function toggleFollow(userId, button, modalType, event) {
     const isFollowing = button.classList.contains('btn-following');
     const action = isFollowing ? 'unfollow' : 'follow';
 
-    // Show loading state
     const originalText = button.textContent;
     button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
     button.disabled = true;
@@ -3005,37 +2896,28 @@ function toggleFollow(userId, button, modalType, event) {
                 button.classList.add('btn-following');
                 button.textContent = 'Following';
                 
-                // Update FOLLOWING count
                 updateFollowingCount(1);
                 
-                // If in followers modal, check if the user now follows back
                 if (modalType === 'followers') {
-                    // No need to remove from list, just update the button
                 }
             } else {
                 button.classList.remove('btn-following');
                 button.classList.add('btn-follow');
                 
-                // Set appropriate text based on modal type
                 if (modalType === 'followers') {
                     button.textContent = 'Follow Back';
                 } else {
                     button.textContent = 'Follow';
                     
-                    // In following modal, DON'T remove the item after unfollowing
-                    // The user can follow again if they want
                 }
                 
-                // Update FOLLOWING count
                 updateFollowingCount(-1);
             }
 
-            // Reset button state
             button.disabled = false;
             showAlert(data.message, 'success');
         } else {
             showAlert(data.message || 'Failed to update follow status', 'error');
-            // Revert button state on error
             button.textContent = originalText;
             button.disabled = false;
         }
@@ -3043,7 +2925,6 @@ function toggleFollow(userId, button, modalType, event) {
     .catch(error => {
         console.error('Error:', error);
         showAlert('An error occurred while updating follow status', 'error');
-        // Revert button state on error
         button.textContent = originalText;
         button.disabled = false;
     });
@@ -3056,7 +2937,6 @@ function removeFollower(userId, button) {
         return;
     }
     
-    // Show loading state
     const originalHtml = button.innerHTML;
     button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
     button.disabled = true;
@@ -3071,7 +2951,6 @@ function removeFollower(userId, button) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            // Remove the user from the list
             const listItem = button.closest('.follow-item');
             if (listItem) {
                 listItem.style.opacity = '0';
@@ -3079,10 +2958,8 @@ function removeFollower(userId, button) {
                 setTimeout(() => {
                     listItem.remove();
                     
-                    // Update FOLLOWER count
                     updateFollowerCount(-1);
                     
-                    // If no more followers, show message
                     if (document.querySelectorAll('.follow-item').length === 0) {
                         document.getElementById('followList').innerHTML = 
                             '<div class="no-follows">No followers found</div>';
@@ -3093,7 +2970,6 @@ function removeFollower(userId, button) {
             showAlert(data.message, 'success');
         } else {
             showAlert(data.message || 'Failed to remove follower', 'error');
-            // Revert button state on error
             button.innerHTML = originalHtml;
             button.disabled = false;
         }
@@ -3101,42 +2977,35 @@ function removeFollower(userId, button) {
     .catch(error => {
         console.error('Error:', error);
         showAlert('An error occurred while removing follower', 'error');
-        // Revert button state on error
         button.innerHTML = originalHtml;
         button.disabled = false;
     });
 }
 
-// Function to update FOLLOWING count in real-time
 function updateFollowingCount(change) {
     const followingStat = document.getElementById('followingStat');
     const followingValue = followingStat.querySelector('.stat-value');
     const currentCount = parseInt(followingValue.textContent);
     const newCount = Math.max(0, currentCount + change);
     
-    // Animate the count change
     animateValue(followingValue, currentCount, newCount, 500);
 }
 
-// Function to update FOLLOWER count in real-time
 function updateFollowerCount(change) {
     const followerStat = document.getElementById('followersStat');
     const followerValue = followerStat.querySelector('.stat-value');
     const currentCount = parseInt(followerValue.textContent);
     const newCount = Math.max(0, currentCount + change);
     
-    // Animate the count change
     animateValue(followerValue, currentCount, newCount, 500);
 }
 
-// Enhanced animateValue function with better animation
 function animateValue(element, start, end, duration) {
     let startTimestamp = null;
     const step = (timestamp) => {
         if (!startTimestamp) startTimestamp = timestamp;
         const progress = Math.min((timestamp - startTimestamp) / duration, 1);
         
-        // Easing function for smoother animation
         const easeOutQuart = 1 - Math.pow(1 - progress, 4);
         const value = Math.floor(easeOutQuart * (end - start) + start);
         
@@ -3150,7 +3019,6 @@ function animateValue(element, start, end, duration) {
 }
 
 function showAlert(message, type) {
-    // Create alert element
     const alert = document.createElement('div');
     alert.className = `alert alert-${type}`;
     alert.textContent = message;
@@ -3175,7 +3043,6 @@ function showAlert(message, type) {
     
     document.body.appendChild(alert);
     
-    // Remove alert after 3 seconds
     setTimeout(() => {
         alert.style.animation = 'fadeOut 0.3s';
         setTimeout(() => {
@@ -3184,14 +3051,12 @@ function showAlert(message, type) {
     }, 3000);
 }
 
-// Close modals when clicking outside
 window.addEventListener('click', function(event) {
     if (event.target.classList.contains('modal')) {
         event.target.classList.remove('active');
     }
 });
 
-// Animate stat counters
 function animateValue(element, start, end, duration) {
     let startTimestamp = null;
     const step = (timestamp) => {
@@ -3217,4 +3082,3 @@ document.querySelectorAll('.stat-value').forEach(el => {
 </script>
 
 <?php require_once 'includes/footer.php'; ?>
-

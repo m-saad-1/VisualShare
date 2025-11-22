@@ -1,39 +1,49 @@
 <?php
 require_once 'includes/config.php';
 
-// ✅ Handle AJAX "like/unlike" request before page renders
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ajax'])) {
+// Set pagination variables
+$page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int)$_GET['page'] : 1;
+$items_per_page = 12; // Initial load count
+$offset = ($page - 1) * $items_per_page;
+
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
+if (
+    ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ajax'])) ||
+    (isset($_GET['ajax']) && $_GET['ajax'] === '1')
+) {
     header('Content-Type: application/json');
 
-    if ($_POST['ajax'] === 'like') {
-        $response = ['success' => false, 'message' => 'Invalid request', 'like_count' => 0];
+    try {
+        if ($_POST['ajax'] === 'like') {
+            $response = ['success' => false, 'message' => 'Invalid request', 'like_count' => 0];
 
-        if (empty($_SESSION['user_id'])) {
-            http_response_code(401);
-            $response['message'] = 'Authentication required';
-            echo json_encode($response);
-            exit;
-        }
+            if (empty($_SESSION['user_id'])) {
+                http_response_code(401);
+                $response['message'] = 'Authentication required';
+                echo json_encode($response);
+                exit;
+            }
 
-        $upload_id = filter_var($_POST['upload_id'] ?? 0, FILTER_VALIDATE_INT);
-        $action = ($_POST['action'] === 'like') ? 'like' : 'unlike';
-        $user_id = (int)$_SESSION['user_id'];
+            $upload_id = filter_var($_POST['upload_id'] ?? 0, FILTER_VALIDATE_INT);
+            $action = ($_POST['action'] === 'like') ? 'like' : 'unlike';
+            $user_id = (int)$_SESSION['user_id'];
 
-        if (!$upload_id) {
-            http_response_code(400);
-            $response['message'] = 'Invalid content ID';
-            echo json_encode($response);
-            exit;
-        }
+            if (!$upload_id) {
+                http_response_code(400);
+                $response['message'] = 'Invalid content ID';
+                echo json_encode($response);
+                exit;
+            }
 
-        if ($conn->connect_error) {
-            http_response_code(500);
-            $response['message'] = 'Database connection failed';
-            echo json_encode($response);
-            exit;
-        }
+            if ($conn->connect_error) {
+                http_response_code(500);
+                $response['message'] = 'Database connection failed';
+                echo json_encode($response);
+                exit;
+            }
 
-        try {
             $stmt = $conn->prepare("SELECT id FROM uploads WHERE id = ?");
             $stmt->bind_param("i", $upload_id);
             $stmt->execute();
@@ -78,41 +88,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ajax'])) {
                 'message' => ucfirst($action) . ' successful'
             ];
             echo json_encode($response);
-        } catch (Exception $e) {
-            http_response_code(500);
-            $response['message'] = 'Server error: ' . $e->getMessage();
-            echo json_encode($response);
-        }
-        exit;
-    }
-    elseif ($_POST['ajax'] === 'save') {
-        $response = ['success' => false, 'message' => 'Invalid request', 'saved' => false];
-
-        if (empty($_SESSION['user_id'])) {
-            http_response_code(401);
-            $response['message'] = 'Authentication required';
-            echo json_encode($response);
             exit;
-        }
+        } elseif ($_POST['ajax'] === 'save') {
+            $response = ['success' => false, 'message' => 'Invalid request', 'saved' => false];
 
-        $upload_id = filter_var($_POST['upload_id'] ?? 0, FILTER_VALIDATE_INT);
-        $user_id = (int)$_SESSION['user_id'];
+            if (empty($_SESSION['user_id'])) {
+                http_response_code(401);
+                $response['message'] = 'Authentication required';
+                echo json_encode($response);
+                exit;
+            }
 
-        if (!$upload_id) {
-            http_response_code(400);
-            $response['message'] = 'Invalid content ID';
-            echo json_encode($response);
-            exit;
-        }
+            $upload_id = filter_var($_POST['upload_id'] ?? 0, FILTER_VALIDATE_INT);
+            $user_id = (int)$_SESSION['user_id'];
 
-        if ($conn->connect_error) {
-            http_response_code(500);
-            $response['message'] = 'Database connection failed';
-            echo json_encode($response);
-            exit;
-        }
+            if (!$upload_id) {
+                http_response_code(400);
+                $response['message'] = 'Invalid content ID';
+                echo json_encode($response);
+                exit;
+            }
 
-        try {
+            if ($conn->connect_error) {
+                http_response_code(500);
+                $response['message'] = 'Database connection failed';
+                echo json_encode($response);
+                exit;
+            }
+
             $stmt = $conn->prepare("SELECT id FROM uploads WHERE id = ?");
             $stmt->bind_param("i", $upload_id);
             $stmt->execute();
@@ -145,29 +148,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ajax'])) {
             }
             $check->close();
             echo json_encode($response);
-        } catch (Exception $e) {
-            http_response_code(500);
-            $response['message'] = 'Server error: ' . $e->getMessage();
-            echo json_encode($response);
+            exit;
         }
+    } catch (Exception $e) {
+        http_response_code(500);
+        echo json_encode(['success' => false, 'message' => 'Server error: ' . $e->getMessage()]);
         exit;
     }
 }
 
-// Set pagination variables
-$page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
-$items_per_page = 12;
-$offset = ($page - 1) * $items_per_page;
-
-require_once 'includes/header.php';
-
-// Initialize search variable
 $search_query = isset($_GET['search']) ? trim($_GET['search']) : '';
 $current_user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 0;
 
-// Main query with error handling
 try {
-    // Check if required tables exist
     $tables_exist = true;
     $required_tables = ['likes', 'upload_tags', 'tags', 'user_favorites'];
     foreach ($required_tables as $table) {
@@ -199,7 +192,6 @@ try {
                          OR uploads.description LIKE ? 
                          OR users.username LIKE ?
                          OR t.name LIKE ?)";
-            
             $search_param = "%$search_query%";
             array_push($params, $search_param, $search_param, $search_param, $search_param);
             $types .= 'ssss';
@@ -209,6 +201,7 @@ try {
         array_push($params, $items_per_page, $offset);
         $types .= 'ii';
 
+        
         $stmt = $conn->prepare($query);
         if ($stmt) {
             $stmt->bind_param($types, ...$params);
@@ -218,20 +211,16 @@ try {
             throw new Exception("Query preparation failed: " . $conn->error);
         }
     } else {
-        // Fallback query if tables don't exist
         $query = "SELECT uploads.*, users.username, users.profile_pic 
                   FROM uploads 
                   JOIN users ON uploads.user_id = users.id 
-                  WHERE (? = '' OR uploads.title LIKE ? OR uploads.description LIKE ? OR users.username LIKE ?)
-                  ORDER BY upload_date DESC LIMIT ? OFFSET ?";
-        
+                  WHERE (? = '' OR uploads.title LIKE ? OR uploads.description LIKE ? OR users.username LIKE ?)";
         $stmt = $conn->prepare($query);
         $search_param = "%$search_query%";
         $stmt->bind_param("ssssii", $search_query, $search_param, $search_param, $search_param, $items_per_page, $offset);
         $stmt->execute();
         $result = $stmt->get_result();
-        
-        // Initialize default values
+
         $rows = $result->fetch_all(MYSQLI_ASSOC);
         $result = new ArrayIterator($rows);
         foreach ($result as &$row) {
@@ -241,12 +230,27 @@ try {
             $row['tag_names'] = '';
         }
     }
-    
-    // Get total count for pagination
+
+    // If it's an AJAX request for more items, output JSON and exit.
+    if (isset($_GET['ajax']) && $_GET['ajax'] === '1') {
+        $items = $result->fetch_all(MYSQLI_ASSOC);
+        echo json_encode(['success' => true, 'items' => $items, 'has_more' => count($items) === $items_per_page]);
+        exit;
+    }
+
+    // For initial page load, include the header.
+    require_once 'includes/header.php';
+
+    // Fetch all items for the initial page render
+    $items = $result->fetch_all(MYSQLI_ASSOC);
+    if (empty($search_query)) {
+        shuffle($items);
+    }
+
+    // Get total count for pagination logic in JS
     $count_query = "SELECT COUNT(DISTINCT uploads.id) as total 
                    FROM uploads 
                    JOIN users ON uploads.user_id = users.id";
-    
     if ($tables_exist && !empty($search_query)) {
         $count_query .= " LEFT JOIN upload_tags ut ON ut.upload_id = uploads.id
                          LEFT JOIN tags t ON t.id = ut.tag_id
@@ -259,7 +263,7 @@ try {
                          OR uploads.description LIKE ? 
                          OR users.username LIKE ?)";
     }
-    
+
     $count_stmt = $conn->prepare($count_query);
     if (!empty($search_query)) {
         $search_param = "%$search_query%";
@@ -269,102 +273,84 @@ try {
             $count_stmt->bind_param("sss", $search_param, $search_param, $search_param);
         }
     }
-    
-    $count_stmt->execute();
-    $count_result = $count_stmt->get_result();
-    $total_count = $count_result->fetch_assoc()['total'];
-    $total_pages = ceil($total_count / $items_per_page);
-    
 } catch (Exception $e) {
     die("Database error: " . $e->getMessage());
 }
 ?>
 
 <!-- Loading overlay -->
-<div id="loading-overlay" class="loading-overlay">
+<div id="loading-overlay" class="loading-overlay" aria-hidden="true">
     <!-- From Uiverse.io by cosnametv -->
-    <div class="loader">
-        <span></span>
-        <span></span>
-        <span></span>
-        <span></span>
-        <span></span>
-        <span></span>
+    <div class="loader" role="status" aria-live="polite" aria-label="Loading content">
+        <span></span><span></span><span></span><span></span><span></span><span></span>
     </div>
 </div>
 
-<div class="container" style="opacity: 0;">
+<div class="container" style="opacity: 0; transition: opacity 0.5s ease-in-out;" tabindex="-1">
     <h1>Latest Visual Content</h1>
-    
+
     <?php if(isset($_SESSION['success'])): ?>
         <div class="alert alert-success">
             <?php echo $_SESSION['success']; unset($_SESSION['success']); ?>
         </div>
     <?php endif; ?>
-    
-     <div class="search-container">
-        <form method="get" class="search-form">
+
+    <div class="search-container">
+        <form method="get" class="search-form" role="search" aria-label="Search content">
             <div class="search-input-group">
-                <i class="fas fa-search search-icon"></i>
-                <input type="text" 
+                <i class="fas fa-search search-icon" aria-hidden="true"></i>
+                <input type="search" 
                        name="search" 
                        placeholder="Search titles, descriptions, tags or users..." 
                        value="<?php echo htmlspecialchars($search_query); ?>" 
                        class="search-input"
-                       aria-label="Search content">
+                       aria-label="Search content"
+                       autocomplete="off"
+                       spellcheck="false"
+                       />
                 <?php if(!empty($search_query)): ?>
                     <button type="button" class="clear-search" aria-label="Clear search">
-                        <i class="fas fa-times"></i>
+                        <i class="fas fa-times" aria-hidden="true"></i>
                     </button>
                 <?php endif; ?>
-                <button type="submit" class="search-button">
+                <button type="submit" class="search-button" aria-label="Submit search">
                     Search
                 </button>
             </div>
-            <div class="search-tags">
+            <div class="search-tags" aria-label="Popular search tags">
                 <span class="search-tag-label">Popular: </span>
-                <a href="?search=landscape" class="search-tag">landscape</a>
-                <a href="?search=portrait" class="search-tag">portrait</a>
-                <a href="?search=art" class="search-tag">art</a>
-                <a href="?search=photography" class="search-tag">photography</a>
+                <a href="?search=landscape" class="search-tag" role="link">landscape</a>
+                <a href="?search=portrait" class="search-tag" role="link">portrait</a>
+                <a href="?search=art" class="search-tag" role="link">art</a>
+                <a href="?search=photography" class="search-tag" role="link">photography</a>
             </div>
         </form>
     </div>
-    
-    <div class="masonry-grid" id="masonryGrid">
-        <?php if($result->num_rows > 0): ?>
-            <?php
-            $items = $result->fetch_all(MYSQLI_ASSOC);
-            ?>
 
+    <div class="masonry-grid" id="masonryGrid" aria-live="polite" aria-relevant="additions">
+        <?php if(count($items) > 0): ?>
             <?php foreach ($items as $row): ?>
                 <?php
                 $file_ext = strtolower(pathinfo($row['filename'], PATHINFO_EXTENSION));
                 $is_video = in_array($file_ext, ['mp4', 'mov', 'avi', 'wmv', 'webm']);
-                
-                // Correct display path using filepath from DB and BASE_URL
                 $display_path = BASE_URL . '/' . $row['filepath'];
-
-                // Correct physical absolute path to check file existence
                 $absolute_path = __DIR__ . '/' . $row['filepath'];
-                error_log("Checking file: " . $absolute_path . " - Exists: " . (file_exists($absolute_path) ? 'true' : 'false'));
-                
-                // Use the stored thumbnail if available
+
+                // Use the stored thumbnail if available for videos
                 $thumbnail_to_show = '';
-                if($is_video && !empty($row['thumbnail_path'])) {
+                $absolute_thumbnail_path = '';
+                if ($is_video && !empty($row['thumbnail_path'])) {
                     $thumbnail_display_path = str_replace($_SERVER['DOCUMENT_ROOT'], '', $row['thumbnail_path']);
                     $thumbnail_display_path = str_replace('\\', '/', $thumbnail_display_path);
                     if (!str_starts_with($thumbnail_display_path, '/')) {
                         $thumbnail_display_path = '/' . $thumbnail_display_path;
                     }
-                    // Fix: Use absolute path for file_exists check
                     $absolute_thumbnail_path = __DIR__ . '/' . $row['thumbnail_path'];
-                    error_log("Checking thumbnail file: " . $absolute_thumbnail_path . " - Exists: " . (file_exists($absolute_thumbnail_path) ? 'true' : 'false'));
                     if (file_exists($absolute_thumbnail_path)) {
                         $thumbnail_to_show = $thumbnail_display_path;
                     }
                 }
-                
+
                 // Generate initials for avatar fallback
                 $initials = '';
                 if(!empty($row['username'])) {
@@ -374,76 +360,116 @@ try {
                         $initials .= strtoupper(substr(end($names), 0, 1));
                     }
                 }
-                
+
                 // Parse tags
                 $tags = !empty($row['tag_names']) ? explode(',', $row['tag_names']) : [];
                 ?>
                 <div class="masonry-item" data-upload-id="<?php echo $row['id']; ?>">
-                    <a href="view.php?id=<?php echo $row['id']; ?>" class="masonry-content">
+                    <a href="view.php?id=<?php echo $row['id']; ?>" class="masonry-content" tabindex="0">
                         <?php if(file_exists($absolute_path)): ?>
-                        <?php if($is_video): ?>
-                            <div class="video-thumbnail-container">
-                                <div class="image-skeleton"></div>
-                                <?php if(!empty($thumbnail_to_show)): ?>
-                                    <img src="<?php echo $thumbnail_to_show; ?>"
-                                         alt="Thumbnail for <?php echo htmlspecialchars($row['title']); ?>"
-                                         loading="lazy"
-                                         onload="this.classList.add('loaded'); this.previousElementSibling.style.display='none';">
-                                <?php else: ?>
-                                    <!-- Fallback - show first frame -->
-                                    <video width="100%" preload="metadata" muted onload="this.classList.add('loaded'); this.previousElementSibling.style.display='none';">
-                                        <source src="<?php echo $display_path; ?>#t=<?php echo $row['thumbnail_time']; ?>"
-                                                type="video/<?php echo $file_ext; ?>">
-                                    </video>
-                                <?php endif; ?>
-                                <div class="video-play-icon">
-                                    <i class="fas fa-play"></i>
+                            <?php if($is_video): ?>
+                                <div class="video-thumbnail-container">
+                                    <div class="image-skeleton"></div>
+                                    <?php if(!empty($thumbnail_to_show)): 
+                                        $thumbnail_width = 640; // Default
+                                        $thumbnail_height = 360; // Default
+                                        if (!empty($thumbnail_to_show) && file_exists($absolute_thumbnail_path)) {
+                                            $thumb_size = getimagesize($absolute_thumbnail_path);
+                                            if ($thumb_size && $thumb_size[0] > 0 && $thumb_size[1] > 0) {
+                                                $thumbnail_width = $thumb_size[0];
+                                                $thumbnail_height = $thumb_size[1];
+                                            }
+                                        } else if ($is_video) {
+                                            $thumbnail_width = 640; 
+                                            $thumbnail_height = 360;
+                                        }
+                                    ?>
+                                        <img src="<?php echo $thumbnail_to_show; ?>?quality=70"
+                                             alt="Thumbnail for <?php echo htmlspecialchars($row['title']); ?>"
+                                             loading="lazy"
+                                             decoding="async"
+                                             <?php if ($thumbnail_width && $thumbnail_height): ?>
+                                             width="<?php echo $thumbnail_width; ?>"
+                                             height="<?php echo $thumbnail_height; ?>"
+                                             <?php endif; ?>
+                                             onload="this.classList.add('loaded'); this.previousElementSibling.style.opacity='0';">
+                                    <?php else: ?>
+                                        <video width="100%" preload="metadata" muted 
+                                               onloadeddata="this.classList.add('loaded'); this.previousElementSibling.style.display='none';"
+                                               playsinline>
+                                            <source src="<?php echo $display_path; ?>#t=<?php echo $row['thumbnail_time']; ?>"
+                                                    type="video/<?php echo $file_ext; ?>">
+                                        </video>
+                                    <?php endif; ?>
+                                    <div class="video-play-icon" aria-label="Play video">
+                                        <i class="fas fa-play" aria-hidden="true"></i>
+                                    </div>
                                 </div>
-                            </div>
+                            <?php else: ?>
+                                <?php
+                                // Calculate aspect ratio to prevent layout shift
+                                $aspect_ratio_style = 'padding-top: 100%;';
+                                $image_size = @getimagesize($absolute_path);
+                                if (file_exists($absolute_path)) {
+                                    if ($image_size && $image_size[0] > 0 && $image_size[1] > 0) {
+                                        $aspect_ratio_style = 'padding-top: ' . ($image_size[1] / $image_size[0] * 100) . '%;';
+                                    }
+                                }
+                                ?>
+                                <div class="image-aspect-ratio-container" style="<?php echo $aspect_ratio_style; ?>">
+                                    <div class="image-skeleton"></div>
+                                    <img src="<?php echo $display_path; ?>?quality=70" 
+                                         alt="<?php echo htmlspecialchars($row['title']); ?>"
+                                         loading="lazy"
+                                         decoding="async"
+                                         <?php if ($image_size && $image_size[0] > 0 && $image_size[1] > 0): ?>
+                                         width="<?php echo $image_size[0]; ?>"
+                                         height="<?php echo $image_size[1]; ?>"
+                                         <?php endif; ?>
+                                         onload="this.classList.add('loaded'); this.previousElementSibling.style.opacity = '0';">
+                                </div>
+                            <?php endif; ?>
                         <?php else: ?>
-                            <div class="image-skeleton"></div>
-                            <img src="<?php echo $display_path; ?>"
-                                 alt="<?php echo htmlspecialchars($row['title']); ?>"
-                                 loading="lazy"
-                                 onload="this.classList.add('loaded'); this.previousElementSibling.style.display='none';">
-                        <?php endif; ?>
-                        <?php else: ?>
-                            <div class="image-placeholder">
-                                <i class="fas fa-image"></i>
+                            <div class="image-placeholder" role="img" aria-label="Content not found">
+                                <i class="fas fa-image" aria-hidden="true"></i>
                                 <p>Content not found</p>
                             </div>
                         <?php endif; ?>
                         <div class="masonry-overlay">
                             <h3><?php echo htmlspecialchars($row['title']); ?></h3>
                             <p class="description"><?php echo htmlspecialchars(substr($row['description'], 0, 100)); ?></p>
-                            
-                            <div class="item-actions">
-                                <button class="like-btn <?php echo $row['user_liked'] ? 'liked' : ''; ?>" 
-                                        data-upload-id="<?php echo $row['id']; ?>">
-                                    <i class="fas fa-heart"></i>
-                                    <span class="like-count"><?php echo $row['like_count']; ?></span>
-                                </button>
-                                <button class="save-btn <?php echo $row['user_saved'] ? 'saved' : ''; ?>" 
-                                        data-upload-id="<?php echo $row['id']; ?>">
-                                    <i class="fas fa-bookmark"></i>
-                                </button>
-                            </div>
-                            
-                            <div class="user-info">
-                                <div class="user-avatar">
-                                    <?php if(!empty($row['profile_pic'])): ?>
-                                        <img src="<?php echo BASE_URL . '/' . htmlspecialchars($row['profile_pic']); ?>" 
-                                             alt="<?php echo htmlspecialchars($row['username']); ?>'s profile picture"
-                                             class="user-profile-pic">
-                                    <?php else: ?>
-                                        <div class="user-avatar-initials">
-                                            <?php echo $initials; ?>
-                                        </div>
-                                    <?php endif; ?>
+
+                            <div class="masonry-footer">
+                                <div class="user-info">
+                                    <div class="user-avatar" aria-label="User avatar">
+                                        <?php if(!empty($row['profile_pic'])): ?>
+                                            <img src="<?php echo BASE_URL . '/' . htmlspecialchars($row['profile_pic']); ?>" 
+                                                 alt="<?php echo htmlspecialchars($row['username']); ?>'s profile picture"
+                                                 class="user-profile-pic"
+                                                 loading="lazy"
+                                                 decoding="async"
+                                                 onload="this.classList.add('loaded');">
+                                        <?php else: ?>
+                                            <div class="user-avatar-initials" aria-hidden="true">
+                                                <?php echo $initials; ?>
+                                            </div>
+                                        <?php endif; ?>
+                                    </div>
+                                    <div class="user-meta">
+                                        <span class="username"><?php echo htmlspecialchars($row['username']); ?></span>
+                                        <span class="upload-date"><?php echo date('M j, Y', strtotime($row['upload_date'])); ?></span>
+                                    </div>
                                 </div>
-                                <div class="user-meta">
-                                    <span class="username"><?php echo htmlspecialchars($row['username']); ?></span>
-                                    <span class="upload-date"><?php echo date('M j, Y', strtotime($row['upload_date'])); ?></span>
+                                <div class="item-actions">
+                                    <button class="like-btn <?php echo $row['user_liked'] ? 'liked' : ''; ?>" 
+                                            data-upload-id="<?php echo $row['id']; ?>" aria-label="Like">
+                                        <i class="fas fa-heart" aria-hidden="true"></i>
+                                        <span class="like-count"><?php echo $row['like_count']; ?></span>
+                                    </button>
+                                    <button class="save-btn <?php echo $row['user_saved'] ? 'saved' : ''; ?>" 
+                                            data-upload-id="<?php echo $row['id']; ?>" aria-label="Save">
+                                        <i class="fas fa-bookmark" aria-hidden="true"></i>
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -454,408 +480,16 @@ try {
             <p class="no-content">No content found. Try adjusting your search or <a href="upload.php">upload something</a>!</p>
         <?php endif; ?>
     </div>
-
-    <!-- Skeleton loading templates -->
-    <template id="skeletonItemTemplate">
-        <div class="masonry-item skeleton-item">
-            <div class="skeleton-thumbnail"></div>
-            <div class="skeleton-content">
-                <div class="skeleton-line skeleton-title"></div>
-                <div class="skeleton-line skeleton-desc"></div>
-                <div class="skeleton-tags">
-                    <div class="skeleton-tag"></div>
-                    <div class="skeleton-tag"></div>
-                </div>
-                <div class="skeleton-actions">
-                    <div class="skeleton-action"></div>
-                    <div class="skeleton-action"></div>
-                </div>
-                <div class="skeleton-user">
-                    <div class="skeleton-avatar"></div>
-                    <div class="skeleton-user-info">
-                        <div class="skeleton-line"></div>
-                        <div class="skeleton-line"></div>
-                    </div>
-                </div>
-            </div>
+    <div id="loader" class="infinite-scroll-loader" style="display: none;">
+        <div class="loader">
+            <span></span><span></span><span></span><span></span><span></span><span></span>
         </div>
-    </template>
+    </div>
+
 </div>
 
 <style>
-    :root {
-    --primary-color: #4361ee;
-    --secondary-color: #3f37c9;
-    --accent-color: #4895ef;
-    --light-color: #f8f9fa;
-    --dark-color: #212529;
-    --success-color: #4cc9f0;
-    --danger-color: #f72585;
-    --warning-color: #f8961e;
-}
-
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
-body {
-    background-color: #f5f5f5;
-    color: var(--dark-color);
-    line-height: 1.6;
-}
-
-.container {
-    width: 90%;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 15px;
-}
-
-.header {
-    background-color: white;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    position: sticky;
-    top: 0;
-    z-index: 100;
-}
-
-.header .container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem 0;
-}
-
-.logo a {
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: var(--primary-color);
-    text-decoration: none;
-}
-
-
-
-.nav ul {
-    display: flex;
-    list-style: none;
-}
-
-.nav ul li {
-    margin-left: 1.5rem;
-}
-
-.nav ul li a {
-    text-decoration: none;
-    color: var(--dark-color);
-    font-weight: 500;
-    transition: color 0.3s;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.nav ul li a:hover {
-    color: var(--primary-color);
-}
-
-.main-content {
-    padding: 2rem 0;
-}
-
-.footer {
-    background-color: var(--dark-color);
-    color: white;
-    padding: 1.5rem 0;
-    text-align: center;
-    margin-top: 2rem;
-}
-
-
-/* Masonry Grid Fix */
-.grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    grid-gap: 20px;
-    margin: 0 auto;
-}
-
-.grid-item {
-    break-inside: avoid;
-    margin-bottom: 20px;
-    transition: transform 0.3s ease;
-}
-
-
-
-.image-placeholder {
-    width: 100%;
-    height: 200px;
-    background-color: #f0f0f0;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    color: #999;
-}
-
-.image-placeholder i {
-    font-size: 3rem;
-    margin-bottom: 1rem;
-}
-
-.no-content {
-    text-align: center;
-    padding: 2rem;
-    font-size: 1.2rem;
-    color: #666;
-}
-
-.no-content a {
-    color: var(--primary-color);
-    text-decoration: none;
-}
-
-.no-content a:hover {
-    text-decoration: underline;
-}
-
-img {
-    max-width: 100%;
-    height: auto;
-    display: block;
-    transition: opacity 0.3s;
-}
-
-img[loading="lazy"] {
-    opacity: 0;
-    transition: opacity 0.3s;
-}
-
-img[loading="lazy"].loaded {
-    opacity: 1;
-}
-
-
-/* Image Zoom Styles */
-.image-wrapper.zoomed {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 1000;
-    background: rgba(0, 0, 0, 0.9);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 2rem;
-    cursor: zoom-out;
-}
-
-.image-wrapper.zoomed img {
-    max-width: 90%;
-    max-height: 90%;
-    object-fit: contain;
-}
-
-/* Drag and Drop Styles */
-.upload-area.dragover {
-    border-color: var(--primary-color);
-    background-color: rgba(67, 97, 238, 0.1);
-}
-
-/* Loading States */
-img.loading {
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-img.loaded {
-    opacity: 1;
-}
-/* Auth Forms */
-.auth-container {
-    max-width: 500px;
-    margin: 2rem auto;
-    padding: 2rem;
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.auth-container h2 {
-    text-align: center;
-    margin-bottom: 1.5rem;
-    color: var(--primary-color);
-}
-
-.form-group {
-    margin-bottom: 1.5rem;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-weight: 500;
-}
-
-.form-group input {
-    width: 100%;
-    padding: 0.75rem;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 1rem;
-    transition: border-color 0.3s;
-}
-
-.form-group input:focus {
-    outline: none;
-    border-color: var(--primary-color);
-}
-
-.btn {
-    display: inline-block;
-    padding: 0.75rem 1.5rem;
-    background-color: var(--primary-color);
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 1rem;
-    font-weight: 500;
-    transition: background-color 0.3s;
-    text-decoration: none;
-    text-align: center;
-}
-
-.btn:hover {
-    background-color: var(--secondary-color);
-}
-
-.btn-block {
-    display: block;
-    width: 100%;
-}
-
-.alert {
-    padding: 1rem;
-    margin-bottom: 1.5rem;
-    border-radius: 4px;
-}
-
-.alert-danger {
-    background-color: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
-}
-
-.alert-success {
-    background-color: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
-}
-
-
-
-/* Upload Form */
-.upload-container {
-    max-width: 800px;
-    margin: 2rem auto;
-    padding: 2rem;
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.upload-preview {
-    width: 100%;
-    max-height: 400px;
-    object-fit: contain;
-    margin-bottom: 1rem;
-    border-radius: 4px;
-    display: none;
-}
-
-.upload-area {
-    border: 2px dashed #ddd;
-    border-radius: 8px;
-    padding: 2rem;
-    text-align: center;
-    margin-bottom: 1.5rem;
-    cursor: pointer;
-    transition: border-color 0.3s;
-}
-
-.upload-area:hover {
-    border-color: var(--primary-color);
-}
-
-.upload-area i {
-    font-size: 3rem;
-    color: var(--primary-color);
-    margin-bottom: 1rem;
-}
-
-.upload-area p {
-    margin-bottom: 0.5rem;
-}
-
-/* Image View */
-.image-view {
-    max-width: 800px;
-    margin: 2rem auto;
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-}
-
-.image-view img {
-    width: 100%;
-    max-height: 600px;
-    object-fit: contain;
-}
-
-.image-info {
-    padding: 1.5rem;
-}
-
-.image-info h2 {
-    margin-bottom: 0.5rem;
-    color: var(--dark-color);
-}
-
-.image-info p {
-    color: #666;
-    margin-bottom: 1rem;
-}
-
-.image-meta {
-    display: flex;
-    justify-content: space-between;
-    color: #888;
-    font-size: 0.9rem;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-    .header .container {
-        flex-direction: column;
-    }
-    
-    .nav ul {
-        margin-top: 1rem;
-    }
-    
-    .nav ul li {
-        margin-left: 1rem;
-        margin-right: 1rem;
-    }
-}
-    /* Loading Overlay Styles */
+ /* Loading Overlay Styles */
     .loading-overlay {
         position: fixed;
         top: 0;
@@ -924,101 +558,6 @@ img.loaded {
         }
     }
     
-    /* Skeleton Loading Styles */
-    .skeleton-item {
-        background: white;
-        border-radius: 8px;
-        overflow: hidden;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        margin-bottom: 20px;
-        animation: skeletonPulse 1.5s ease-in-out infinite;
-        break-inside: avoid;
-    }
-    
-    .skeleton-thumbnail {
-        width: 100%;
-        height: 200px;
-        background: #f0f0f0;
-    }
-    
-    .skeleton-content {
-        padding: 15px;
-    }
-    
-    .skeleton-line {
-        height: 12px;
-        background: #f0f0f0;
-        border-radius: 4px;
-        margin-bottom: 10px;
-    }
-    
-    .skeleton-title {
-        width: 70%;
-        height: 16px;
-    }
-    
-    .skeleton-desc {
-        width: 90%;
-    }
-    
-    .skeleton-tags {
-        display: flex;
-        gap: 5px;
-        margin-bottom: 10px;
-    }
-    
-    .skeleton-tag {
-        width: 40px;
-        height: 20px;
-        background: #f0f0f0;
-        border-radius: 3px;
-    }
-    
-    .skeleton-actions {
-        display: flex;
-        gap: 10px;
-        margin-bottom: 12px;
-    }
-    
-    .skeleton-action {
-        width: 30px;
-        height: 30px;
-        background: #f0f0f0;
-        border-radius: 4px;
-    }
-    
-    .skeleton-user {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        padding-top: 10px;
-        border-top: 1px solid #f0f0f0;
-    }
-    
-    .skeleton-avatar {
-        width: 32px;
-        height: 32px;
-        border-radius: 50%;
-        background: #f0f0f0;
-        flex-shrink: 0;
-    }
-    
-    .skeleton-user-info {
-        flex-grow: 1;
-    }
-    
-    @keyframes skeletonPulse {
-        0% {
-            opacity: 1;
-        }
-        50% {
-            opacity: 0.6;
-        }
-        100% {
-            opacity: 1;
-        }
-    }
-
     /* Individual Image Skeleton Loading */
     .image-skeleton {
         position: absolute;
@@ -1029,8 +568,14 @@ img.loaded {
         background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
         background-size: 200% 100%;
         animation: skeletonShimmer 1.5s infinite;
-        border-radius: 8px 8px 0 0;
         z-index: 1;
+        transition: opacity 0.3s;
+    }
+
+    .infinite-scroll-loader {
+        text-align: center;
+        padding: 20px;
+        width: 100%;
     }
 
     @keyframes skeletonShimmer {
@@ -1042,27 +587,6 @@ img.loaded {
         }
     }
 
-    .video-thumbnail-container {
-        position: relative;
-    }
-
-    .video-thumbnail-container .image-skeleton {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-        background-size: 200% 100%;
-        animation: skeletonShimmer 1.5s infinite;
-        border-radius: 8px 8px 0 0;
-        z-index: 1;
-    }
-    
-    .masonry-column {
-        display: contents; /* This allows the grid to work properly */
-    }
-    
     /* Search Styles */
     .search-container {
         margin: 20px auto 40px;
@@ -1102,7 +626,7 @@ img.loaded {
         border: none;
         background: transparent;
         font-size: 1rem;
-        color: #333;
+        color: 333;
         outline: none;
     }
     
@@ -1210,14 +734,6 @@ img.loaded {
         background: white;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         transition: transform 0.3s ease, box-shadow 0.3s ease;
-        opacity: 0;
-        transform: translateY(20px);
-        transition: opacity 0.5s ease, transform 0.5s ease;
-    }
-
-    .masonry-item.loaded {
-        opacity: 1;
-        transform: translateY(0);
     }
 
     .masonry-item:hover {
@@ -1237,6 +753,15 @@ img.loaded {
         height: auto;
         display: block;
         border-radius: 8px 8px 0 0;
+        transition: opacity 0.3s;
+    }
+
+    .masonry-content img[loading="lazy"] {
+        opacity: 0;
+    }
+
+    .masonry-content img.loaded {
+        opacity: 1;
     }
 
     .masonry-overlay {
@@ -1245,7 +770,7 @@ img.loaded {
 
     .masonry-overlay h3 {
         font-size: 1.1rem;
-        margin-bottom: 8px;
+        margin-bottom: 5px;
         color: #333;
         font-weight: 600;
         white-space: nowrap;
@@ -1256,38 +781,24 @@ img.loaded {
     .masonry-overlay .description {
         font-size: 0.9rem;
         color: #666;
-        margin-bottom: 12px;
+        margin-bottom: 4px; /* Decreased gap */
         line-height: 1.4;
         display: -webkit-box;
-        -webkit-line-clamp: 2;
+        -webkit-line-clamp: 1;
         -webkit-box-orient: vertical;
         overflow: hidden;
     }
     
-    .item-tags {
+    .masonry-footer {
         display: flex;
-        flex-wrap: wrap;
-        gap: 5px;
-        margin-bottom: 10px;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 10px;
     }
     
-    .item-tags .tag {
-        font-size: 0.75rem;
-        padding: 3px 8px;
-        background: #f1f3f5;
-        border-radius: 3px;
-    }
-    
-    .tag-more {
-        font-size: 0.75rem;
-        color: #868e96;
-        align-self: center;
-    }
-
     .item-actions {
         display: flex;
-        gap: 10px;
-        margin-bottom: 12px;
+        gap: 1px;
     }
     
     .like-btn, .save-btn {
@@ -1332,8 +843,6 @@ img.loaded {
         display: flex;
         align-items: center;
         gap: 10px;
-        padding-top: 10px;
-        border-top: 1px solid #eee;
     }
     
     .user-avatar {
@@ -1447,6 +956,115 @@ img.loaded {
         text-decoration: none;
     }
 
+    /* Styles for aspect-ratio image containers to prevent layout shift */
+    .image-aspect-ratio-container {
+        position: relative;
+        height: 0;
+        overflow: hidden;
+        background-color: #f0f0f0;
+        border-radius: 8px 8px 0 0;
+    }
+
+    .image-aspect-ratio-container img {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+/* Modal Styles */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 10000; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgba(0,0,0,0.6); /* Black w/ opacity */
+    justify-content: center;
+    align-items: center;
+    animation: fadeIn 0.3s;
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: auto;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    position: relative;
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+    animation: slideIn 0.3s forwards;
+}
+
+.modal-content h2 {
+    color: var(--primary-color);
+    margin-bottom: 15px;
+    font-size: 1.8rem;
+}
+
+.modal-content p {
+    margin-bottom: 25px;
+    color: #555;
+    line-height: 1.5;
+}
+
+.close-button {
+    color: #aaa;
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close-button:hover,
+.close-button:focus {
+    color: #333;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.modal-actions .btn {
+    padding: 10px 25px;
+    font-size: 1rem;
+    border-radius: 5px;
+}
+
+.modal-actions .btn-primary {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.modal-actions .btn-secondary {
+    background-color: #6c757d;
+    color: white;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideIn {
+    from { transform: translateY(-50px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
     /* Responsive adjustments */
     @media (max-width: 1200px) {
         .masonry-grid {
@@ -1513,7 +1131,47 @@ img.loaded {
         }
     }
 
+    @media (max-width: 768px) {
+        .masonry-grid {
+            column-count: 2; /* Adjust column count for smaller screens */
+            column-gap: 10px; /* Reduce spacing between image cards */
+        }
+
+        .masonry-item {
+            margin-bottom: 10px; /* Reduce spacing between image cards */
+        }
+
+        .save-btn {
+            display: none; /* Hide save button */
+        }
+
+        .masonry-overlay h3 {
+            font-size: 0.9rem; /* Decrease font size */
+            margin-bottom: 3px; /* Decrease spacing */
+        }
+
+        .masonry-overlay .description {
+            font-size: 0.8rem; /* Decrease font size */
+            margin-bottom: 2px; /* Decrease spacing */
+        }
+
+        .user-info {
+            gap: 5px; /* Reduce spacing */
+        }
+
+        .username {
+            font-size: 0.8rem; /* Decrease font size */
+        }
+
+        .upload-date {
+            font-size: 0.7rem; /* Decrease font size */
+        }
+    }
+
     @media (max-width: 600px) {
+        .item-actions {
+            display: none; /* Hide both like and save buttons below 600px */
+        }
         /* Further search box size reduction */
         .search-input {
             padding: 10px 15px 10px 40px;
@@ -1533,6 +1191,18 @@ img.loaded {
         h1 {
             font-size: 1.8rem;
         }
+    }
+
+    @media (max-width: 500px) {
+        .masonry-overlay .description {
+            margin-bottom: 1px; /* Even smaller gap for very small screens */
+        }
+
+    .masonry-footer {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
     }
 
     @media (max-width: 400px) {
@@ -1567,40 +1237,37 @@ img.loaded {
 </style>
 
 <script>
-document.addEventListener('DOMContentLoaded', function () { 
+document.addEventListener('DOMContentLoaded', function () {
+    // --- Page Load, Infinite Scroll, and Actions ---
+    let isLoading = false;
+    let currentPage = <?php echo $page; ?>;
+    let totalPages = <?php echo $total_pages ?? 1; ?>;
+    const container = document.querySelector('.container');
+
     // Hide loading overlay when page is fully loaded
-    window.addEventListener('load', function() {
+    const handlePageLoad = () => {
         const loadingOverlay = document.getElementById('loading-overlay');
-        const container = document.querySelector('.container');
-        
-        // Fade out loading overlay
         if (loadingOverlay) {
-            loadingOverlay.style.opacity = '0';
+            loadingOverlay.style.opacity = '0'; // Start fade out
             setTimeout(function() {
                 loadingOverlay.style.display = 'none';
-                container.style.opacity = '1';
-                
-                // Start loading of items
-                loadItemsAtOnce();
-            }, 500);
-        } else {
+                if (container) container.style.opacity = '1';
+            }, 500); // Match CSS transition
+        } else if (container) {
             container.style.opacity = '1';
-            loadItemsAtOnce();
         }
-    });
-    
-    // If page takes too long to load, show content anyway after 5 seconds
+    };
+
+    window.addEventListener('load', handlePageLoad);
+
+    // Fallback: hide overlay after 5 seconds in case 'load' event fails
     setTimeout(function() {
         const loadingOverlay = document.getElementById('loading-overlay');
-        const container = document.querySelector('.container');
-        
-        if (loadingOverlay && loadingOverlay.style.display !== 'none') {
-            loadingOverlay.style.opacity = '0';
-            setTimeout(function() {
-                loadingOverlay.style.display = 'none';
-                container.style.opacity = '1';
-                loadItemsAtOnce();
-            }, 500);
+        if (container && (!container.style.opacity || container.style.opacity === '0')) {
+            handlePageLoad();
+        } else if (loadingOverlay && loadingOverlay.style.display !== 'none') {
+             loadingOverlay.style.opacity = '0';
+             setTimeout(() => { loadingOverlay.style.display = 'none'; }, 500);
         }
     }, 5000);
 
@@ -1610,113 +1277,152 @@ document.addEventListener('DOMContentLoaded', function () {
             window.location.href = '?';
         });
     }
-    
-    // Load all items at once function
-    function loadItemsAtOnce() {
-        const items = document.querySelectorAll('.masonry-item:not(.skeleton-item)');
-        const skeletonTemplate = document.getElementById('skeletonItemTemplate');
 
-        // Load all items at once without delays
-        items.forEach(item => {
-            item.classList.add('loaded');
-        });
-
-        // If there are more pages, load them after a brief delay
-        if (<?php echo $page < $total_pages ? 'true' : 'false'; ?>) {
-            setTimeout(loadNextPage, 1000);
-        }
-    }
-
-    // Enhanced image loading with skeleton removal
-    function handleImageLoad(img) {
-        const skeleton = img.previousElementSibling;
-        if (skeleton && skeleton.classList.contains('image-skeleton')) {
-            skeleton.style.display = 'none';
-        }
-    }
-
-    // Add load event listeners to all images
-    document.addEventListener('DOMContentLoaded', function() {
-        const images = document.querySelectorAll('.masonry-content img');
-        images.forEach(img => {
-            if (img.complete) {
-                handleImageLoad(img);
-            } else {
-                img.addEventListener('load', function() {
-                    handleImageLoad(this);
-                });
-                img.addEventListener('error', function() {
-                    handleImageLoad(this);
-                });
+    // --- Infinite Scroll ---
+    const observer = new IntersectionObserver(
+        (entries) => {
+            if (entries[0].isIntersecting && !isLoading && currentPage < totalPages) {
+                // fetchMoreItems(); // This can be re-enabled if you want infinite scroll
             }
-        });
-    });
-    
-    // Function to load next page
-    function loadNextPage() {
-        const nextPage = <?php echo $page + 1; ?>;
+        }, { rootMargin: "0px 0px 400px 0px" }
+    );
+
+    const loaderEl = document.getElementById('loader');
+    if (loaderEl) {
+        observer.observe(loaderEl);
+    }
+
+    // This function is ready for when you want to enable infinite scroll
+    async function fetchMoreItems() {
         const params = new URLSearchParams(window.location.search);
-        params.set('page', nextPage);
-        
-        // Add skeleton items for the next page
-        const masonryGrid = document.getElementById('masonryGrid');
-        const skeletonTemplate = document.getElementById('skeletonItemTemplate');
-        
-        for (let i = 0; i < 12; i++) { // Add 12 skeleton items for next page
-            const skeletonItem = skeletonTemplate.content.cloneNode(true);
-            masonryGrid.appendChild(skeletonItem);
-        }
-        
-        // Fetch next page content
-        fetch(`${window.location.pathname}?${params.toString()}`)
-            .then(response => response.text())
-            .then(html => {
-                // Parse the response
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(html, 'text/html');
-                
-                // Extract new items
-                const newItems = doc.querySelectorAll('.masonry-item');
-                
-                // Remove skeletons
-                const skeletons = document.querySelectorAll('.skeleton-item');
-                skeletons.forEach(skeleton => skeleton.remove());
-                
-                // Add new items and load all at once
-                newItems.forEach(item => {
-                    masonryGrid.appendChild(item);
-                    item.classList.add('loaded');
+        isLoading = true;
+        currentPage++;
+        loaderEl.style.display = 'block';
+
+        params.set('page', currentPage);
+        params.set('ajax', '1');
+
+        let data;
+        try {
+            const response = await fetch(`index.php?${params.toString()}`);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const data = await response.json();
+
+            if (data && data.success && data.items.length > 0) {
+                const grid = document.getElementById("masonryGrid");
+                const fragment = document.createDocumentFragment();
+                data.items.forEach(item => {
+                    const newItem = createMasonryItem(item);
+                    fragment.appendChild(newItem);
                 });
-                
-                // Reinitialize event listeners for new items
+                grid.appendChild(fragment);
                 initLikeButtons();
-                initSaveButtons();
-                
-                // Check if there are more pages to load
-                const hasMorePages = nextPage < <?php echo $total_pages; ?>;
-                if (hasMorePages) {
-                    setTimeout(loadNextPage, (newItems.length + 1) * 200 + 1000);
-                }
-            })
-            .catch(error => {
-                console.error('Error loading next page:', error);
-                // Remove skeletons on error
-                const skeletons = document.querySelectorAll('.skeleton-item');
-                skeletons.forEach(skeleton => skeleton.remove());
-            });
+                initSaveButtons(); // Re-initialize for new items
+            }
+
+            if (!data.has_more) {
+                observer.unobserve(loaderEl);
+                loaderEl.style.display = 'none';
+            }
+
+        } catch (error) {
+            console.error("Failed to fetch more items:", error);
+            // Optionally show an error message
+        } finally {
+            isLoading = false;
+            if (currentPage >= totalPages || (data && !data.has_more)) {
+                loaderEl.style.display = 'none';
+            }
+        }
+    }
+
+    // This function is ready for when you want to enable infinite scroll
+    function createMasonryItem(row) {
+        const file_ext = (row.filename.split('.').pop() || '').toLowerCase();
+        const is_video = ['mp4', 'mov', 'avi', 'wmv', 'webm'].includes(file_ext);
+        const display_path = '<?php echo BASE_URL; ?>/' + row.filepath;
+
+        let thumbnail_to_show = '';
+        if (is_video && row.thumbnail_path) {
+            let thumbnail_display_path = row.thumbnail_path.replace(/\\/g, '/');
+            if (!thumbnail_display_path.startsWith('/')) {
+                thumbnail_display_path = '/' + thumbnail_display_path;
+            }
+            thumbnail_to_show = thumbnail_display_path;
+        }
+
+        let initials = '';
+        if (row.username) {
+            const names = row.username.split(' ');
+            initials = (names[0][0] || '').toUpperCase();
+            if (names.length > 1) {
+                initials += (names[names.length - 1][0] || '').toUpperCase();
+            }
+        }
+
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'masonry-item';
+        itemDiv.dataset.uploadId = row.id;
+
+        let mediaHtml;
+        if (is_video) {
+            mediaHtml = `
+                <div class="video-thumbnail-container">
+                    <div class="image-skeleton"></div>
+                    ${thumbnail_to_show ? `
+                        <img src="${thumbnail_to_show}?quality=70" alt="Thumbnail for ${row.title}" loading="lazy" decoding="async" onload="this.classList.add('loaded'); this.previousElementSibling.style.display='none';">
+                    ` : `
+                        <video width="100%" preload="metadata" muted onloadeddata="this.classList.add('loaded'); this.previousElementSibling.style.display='none';" playsinline>
+                            <source src="${display_path}#t=${row.thumbnail_time}" type="video/${file_ext}">
+                        </video>
+                    `}
+                    <div class="video-play-icon" aria-label="Play video"><i class="fas fa-play" aria-hidden="true"></i></div>
+                </div>`;
+        } else {
+            mediaHtml = `
+                <div class="image-aspect-ratio-container" style="padding-top: 100%;"> 
+                    <div class="image-skeleton"></div>
+                    <img src="${display_path}?quality=70" alt="${row.title}" loading="lazy" decoding="async" onload="this.classList.add('loaded'); this.previousElementSibling.style.opacity = '0';">
+                </div>`; // Default aspect ratio
+        }
+
+        itemDiv.innerHTML = `
+            <a href="view.php?id=${row.id}" class="masonry-content" tabindex="0">
+                ${mediaHtml}
+                <div class="masonry-overlay">
+                    <h3>${row.title}</h3>
+                    <p class="description">${row.description.substring(0, 100)}</p>
+                    <div class="masonry-footer">
+                        <div class="user-info">
+                            <div class="user-avatar" aria-label="User avatar">
+                                ${row.profile_pic ? `<img src="<?php echo BASE_URL; ?>/${row.profile_pic}" alt="${row.username}'s profile picture" class="user-profile-pic" loading="lazy" decoding="async" onload="this.classList.add('loaded');">` : `<div class="user-avatar-initials" aria-hidden="true">${initials}</div>`}
+                            </div>
+                            <div class="user-meta">
+                                <span class="username">${row.username}</span>
+                                <span class="upload-date">${new Date(row.upload_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                            </div>
+                        </div>
+                        <div class="item-actions">
+                            <button class="like-btn ${row.user_liked ? 'liked' : ''}" data-upload-id="${row.id}" aria-label="Like"><i class="fas fa-heart" aria-hidden="true"></i><span class="like-count">${row.like_count}</span></button>
+                            <button class="save-btn ${row.user_saved ? 'saved' : ''}" data-upload-id="${row.id}" aria-label="Save"><i class="fas fa-bookmark" aria-hidden="true"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </a>`;
+        return itemDiv;
     }
     
-    // Initialize like and save buttons
+    // --- Like/Save Button Logic ---
     function initLikeButtons() {
         document.querySelectorAll('.like-btn').forEach(button => {
-            // Remove existing event listeners to prevent duplicates
-            button.removeEventListener('click', button._likeHandler);
+            if (button._likeHandler) return; // Already initialized
 
             button._likeHandler = async function (e) {
                 e.preventDefault();
                 e.stopPropagation();
 
-                // Prevent multiple simultaneous requests
                 if (this._isProcessing) {
                     return;
                 }
@@ -1736,7 +1442,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     likeCountEl.textContent = wasLiked ? (originalLikeCount - 1) : (originalLikeCount + 1);
                 }
 
-                // Add loading state
                 this.style.opacity = '0.6';
                 this.style.pointerEvents = 'none';
 
@@ -1775,30 +1480,24 @@ document.addEventListener('DOMContentLoaded', function () {
                         throw new Error(data.message || 'Server returned error');
                     }
 
-                    // Update with server response if available
                     if (likeCountEl && typeof data.like_count !== 'undefined') {
                         likeCountEl.textContent = String(data.like_count);
                     }
 
                 } catch (error) {
                     console.error('Like Error:', error);
-
-                    // Revert optimistic UI
                     this.className = originalClass;
                     if (likeCountEl) {
                         likeCountEl.textContent = String(originalLikeCount);
                     }
-
                     const msg = error.message || '';
                     if (msg.includes('401') || msg.includes('Authentication')) {
-                        window.location.href = 'login.php?return=' + encodeURIComponent(window.location.pathname + window.location.search);
+                        showLoginModal();
                         return;
                     } else {
-                        // Show user-friendly error message
                         showAlert('Failed to update like. Please try again.', 'error');
                     }
                 } finally {
-                    // Reset processing state and visual feedback
                     this._isProcessing = false;
                     this.style.opacity = '';
                     this.style.pointerEvents = '';
@@ -1811,14 +1510,12 @@ document.addEventListener('DOMContentLoaded', function () {
     
     function initSaveButtons() {
         document.querySelectorAll('.save-btn').forEach(button => {
-            // Remove existing event listeners to prevent duplicates
-            button.removeEventListener('click', button._saveHandler);
+            if (button._saveHandler) return; // Already initialized
 
             button._saveHandler = async function (e) {
                 e.preventDefault();
                 e.stopPropagation();
 
-                // Prevent multiple simultaneous requests
                 if (this._isProcessing) {
                     return;
                 }
@@ -1829,10 +1526,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 const wasSaved = this.classList.contains('saved');
                 const originalClass = this.className;
 
-                // Optimistic UI update
                 this.classList.toggle('saved');
 
-                // Add loading state
                 this.style.opacity = '0.6';
                 this.style.pointerEvents = 'none';
 
@@ -1870,32 +1565,25 @@ document.addEventListener('DOMContentLoaded', function () {
                         throw new Error(data.message || 'Server returned error');
                     }
 
-                    // Update UI based on server response
                     if (data.saved) {
                         this.classList.add('saved');
                     } else {
                         this.classList.remove('saved');
                     }
 
-                    // Show success message
                     showAlert(data.message, 'success');
 
                 } catch (error) {
                     console.error('Save Error:', error);
-
-                    // Revert optimistic UI
                     this.className = originalClass;
-
                     const msg = error.message || '';
                     if (msg.includes('401') || msg.includes('Authentication')) {
-                        window.location.href = 'login.php?return=' + encodeURIComponent(window.location.pathname + window.location.search);
+                        showLoginModal();
                         return;
                     } else {
-                        // Show user-friendly error message
                         showAlert('Failed to save content. Please try again.', 'error');
                     }
                 } finally {
-                    // Reset processing state and visual feedback
                     this._isProcessing = false;
                     this.style.opacity = '';
                     this.style.pointerEvents = '';
@@ -1905,12 +1593,10 @@ document.addEventListener('DOMContentLoaded', function () {
             button.addEventListener('click', button._saveHandler);
         });
     }
-    
-    // Initialize buttons on page load
+
     initLikeButtons();
     initSaveButtons();
 
-    // Helper function to show alerts
     function showAlert(message, type) {
         const alert = document.createElement('div');
         alert.className = `alert alert-${type}`;
@@ -1936,7 +1622,6 @@ document.addEventListener('DOMContentLoaded', function () {
         
         document.body.appendChild(alert);
         
-        // Remove alert after 3 seconds
         setTimeout(() => {
             alert.style.animation = 'fadeOut 0.3s';
             setTimeout(() => {
@@ -1944,7 +1629,38 @@ document.addEventListener('DOMContentLoaded', function () {
             }, 300);
         }, 3000);
     }
+
+    function showLoginModal() {
+        const authModal = document.getElementById('authModal');
+        if (authModal) {
+            authModal.style.display = 'flex';
+        }
+    }
+
+    document.querySelector('#authModal .close-button').addEventListener('click', function() {
+        document.getElementById('authModal').style.display = 'none';
+    });
+
+    window.addEventListener('click', function(event) {
+        const authModal = document.getElementById('authModal');
+        if (event.target === authModal) {
+            authModal.style.display = 'none';
+        }
+    });
 });
 </script>
 
 <?php require_once 'includes/footer.php'; ?>
+
+<!-- Login/Register Modal -->
+<div id="authModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="authModalTitle" style="display:none;">
+    <div class="modal-content">
+        <span class="close-button" role="button" aria-label="Close">&times;</span>
+        <h2 id="authModalTitle">Join Our Community!</h2>
+        <p>Like, save, and follow to connect with creators and discover more amazing content.</p>
+        <div class="modal-actions">
+            <a href="login.php" class="btn btn-primary">Log In</a>
+            <a href="register.php" class="btn btn-secondary">Sign Up</a>
+        </div>
+    </div>
+</div>

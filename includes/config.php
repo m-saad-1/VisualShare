@@ -55,6 +55,9 @@ define('BASE_URL', sprintf(
     rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\')
 ));
 
+// Project root directory
+define('ROOT_DIR', dirname(__DIR__));
+
 // File upload configuration
 define('UPLOAD_DIR', str_replace('\\', '/', __DIR__ . '/uploads/'));
 define('MAX_FILE_SIZE', 20 * 1024 * 1024); // 20MB

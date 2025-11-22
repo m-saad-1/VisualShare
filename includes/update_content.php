@@ -33,11 +33,7 @@ try {
     }
 
     // Get input data
-    $input = file_get_contents('php://input');
-    $data = json_decode($input, true);
-    if ($data === null) {
-        $data = $_POST;
-    }
+    $data = $_POST;
 
     // Validate required fields
     if (empty($data['id']) || empty($data['title'])) {
@@ -48,7 +44,7 @@ try {
     $conn->begin_transaction();
 
     // Verify content ownership - fixed with proper parameter binding
-    $check = $conn->prepare("SELECT user_id FROM uploads WHERE id = ?");
+    $check = $conn->prepare("SELECT user_id, filepath, thumbnail_path FROM uploads WHERE id = ?");
     $contentId = (int)$data['id'];
     $check->bind_param("i", $contentId);
     $check->execute();
@@ -69,11 +65,60 @@ try {
         jsonResponse(false, 'Unauthorized to update this content', 403);
     }
 
-    // Update content - fixed binding
-    $update = $conn->prepare("UPDATE uploads SET title = ?, description = ? WHERE id = ?");
+    $new_filepath = null;
+    $new_filename = null;
+
+    // Handle file upload if a new file is provided
+    if (isset($_FILES['file']) && $_FILES['file']['error'] === UPLOAD_ERR_OK) {
+        $file = $_FILES['file'];
+        $file_type = mime_content_type($file['tmp_name']);
+        $file_size = $file['size'];
+        $file_ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+
+        // Validation from config
+        if (!in_array($file_type, ALLOWED_TYPES)) {
+            jsonResponse(false, 'Invalid file type. Only images and videos are allowed.', 400);
+        }
+        if ($file_size > MAX_FILE_SIZE) {
+            jsonResponse(false, 'File size exceeds the limit of ' . (MAX_FILE_SIZE / 1024 / 1024) . 'MB.', 400);
+        }
+
+        // Generate new filename and path
+        if (!file_exists(UPLOAD_DIR)) {
+            mkdir(UPLOAD_DIR, 0777, true);
+        }
+        $new_filename = uniqid('', true) . '.' . $file_ext;
+        $new_filepath_absolute = UPLOAD_DIR . $new_filename;
+        $new_filepath_relative = 'includes/uploads/' . $new_filename;
+
+        if (move_uploaded_file($file['tmp_name'], $new_filepath_absolute)) {
+            chmod($new_filepath_absolute, 0644);
+
+            // Delete old files
+            if (!empty($content['filepath']) && file_exists(ROOT_DIR . DIRECTORY_SEPARATOR . $content['filepath'])) {
+                unlink(ROOT_DIR . DIRECTORY_SEPARATOR . $content['filepath']);
+            }
+            if (!empty($content['thumbnail_path']) && file_exists(ROOT_DIR . DIRECTORY_SEPARATOR . $content['thumbnail_path'])) {
+                unlink(ROOT_DIR . DIRECTORY_SEPARATOR . $content['thumbnail_path']);
+            }
+            
+            $new_filepath = $new_filepath_relative;
+        } else {
+            jsonResponse(false, 'Failed to move uploaded file.', 500);
+        }
+    }
+
+    // Prepare update query
+    if ($new_filepath) {
+        $update = $conn->prepare("UPDATE uploads SET title = ?, description = ?, filepath = ?, filename = ? WHERE id = ?");
+        $update->bind_param("ssssi", $title, $description, $new_filepath, $new_filename, $contentId);
+    } else {
+        $update = $conn->prepare("UPDATE uploads SET title = ?, description = ? WHERE id = ?");
+        $update->bind_param("ssi", $title, $description, $contentId);
+    }
+
     $title = trim($data['title']);
     $description = trim($data['description'] ?? '');
-    $update->bind_param("ssi", $title, $description, $contentId);
     
     if (!$update->execute()) {
         throw new Exception("Update failed: " . $conn->error);

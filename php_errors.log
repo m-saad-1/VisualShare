@@ -915,3 +915,188 @@ Stack trace:
 [15-Sep-2025 16:46:14 Europe/Berlin] PHP Warning:  Trying to access array offset on value of type null in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1891
 [15-Sep-2025 16:46:14 Europe/Berlin] PHP Deprecated:  strtotime(): Passing null to parameter #1 ($datetime) of type string is deprecated in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1891
 [15-Sep-2025 16:46:14 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1904
+[19-Oct-2025 01:15:34 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1904
+[19-Oct-2025 01:15:56 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1904
+[19-Oct-2025 01:28:11 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1904
+[19-Oct-2025 01:33:15 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1904
+[19-Oct-2025 01:33:15 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1904
+[19-Oct-2025 01:36:09 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1903
+[19-Oct-2025 01:37:37 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1903
+[19-Oct-2025 01:38:00 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1903
+[19-Oct-2025 01:38:04 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1903
+[19-Oct-2025 01:39:01 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1905
+[19-Oct-2025 01:39:13 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1905
+[19-Oct-2025 01:39:21 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1905
+[19-Oct-2025 01:39:39 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1904
+[19-Oct-2025 01:40:47 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1904
+[19-Oct-2025 01:41:04 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1904
+[19-Oct-2025 01:45:01 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1904
+[19-Oct-2025 01:45:04 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1904
+[19-Oct-2025 01:47:30 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1904
+[19-Oct-2025 01:49:39 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1890
+[19-Oct-2025 01:49:47 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1890
+[19-Oct-2025 01:52:15 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1841
+[19-Oct-2025 01:52:15 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1841
+[19-Oct-2025 01:52:30 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1841
+[19-Oct-2025 01:56:32 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1841
+[19-Oct-2025 01:56:58 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1841
+[19-Oct-2025 01:57:03 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1841
+[19-Oct-2025 01:57:08 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1841
+[19-Oct-2025 01:57:12 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1841
+[19-Oct-2025 01:57:22 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1899
+[19-Oct-2025 01:57:28 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1899
+[19-Oct-2025 01:58:09 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1899
+[19-Oct-2025 01:59:04 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1841
+[19-Oct-2025 01:59:15 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1841
+[19-Oct-2025 02:01:35 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1841
+[19-Oct-2025 02:02:06 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1841
+[19-Oct-2025 02:09:48 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1841
+[19-Oct-2025 02:09:56 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1841
+[19-Oct-2025 02:10:24 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1841
+[19-Oct-2025 02:17:35 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1841
+[19-Oct-2025 02:25:52 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1841
+[23-Oct-2025 09:51:24 Europe/Berlin] PHP Warning:  mysqli::__construct(): Error while reading greeting packet. PID=13732 in C:\xampp\htdocs\Content-upload - Copy\includes\config.php on line 36
+[23-Oct-2025 09:51:24 Europe/Berlin] MySQL server has gone away
+[23-Oct-2025 19:00:41 Europe/Berlin] No connection could be made because the target machine actively refused it
+[23-Oct-2025 19:01:06 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: MySQL server has gone away in C:\xampp\htdocs\Content-upload - Copy\includes\header.php:11
+Stack trace:
+#0 C:\xampp\htdocs\Content-upload - Copy\includes\header.php(11): mysqli->prepare('SELECT profile_...')
+#1 C:\xampp\htdocs\Content-upload - Copy\index.php(152): require_once('C:\\xampp\\htdocs...')
+#2 {main}
+  thrown in C:\xampp\htdocs\Content-upload - Copy\includes\header.php on line 11
+[24-Oct-2025 20:17:44 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1805
+[24-Oct-2025 20:20:16 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1805
+[24-Oct-2025 20:21:56 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1805
+[24-Oct-2025 20:21:57 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1805
+[24-Oct-2025 20:22:14 Europe/Berlin] Content update error: Undefined constant "ROOT_DIR"
+[24-Oct-2025 20:22:44 Europe/Berlin] Content update error: Undefined constant "ROOT_DIR"
+[24-Oct-2025 20:23:24 Europe/Berlin] Content update error: Undefined constant "ROOT_DIR"
+[24-Oct-2025 20:23:24 Europe/Berlin] Content update error: Undefined constant "ROOT_DIR"
+[24-Oct-2025 20:23:24 Europe/Berlin] Content update error: Undefined constant "ROOT_DIR"
+[24-Oct-2025 20:23:24 Europe/Berlin] Content update error: Undefined constant "ROOT_DIR"
+[24-Oct-2025 20:25:42 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1805
+[24-Oct-2025 20:34:11 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1805
+[24-Oct-2025 20:39:50 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1805
+[24-Oct-2025 20:41:07 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1805
+[24-Oct-2025 21:03:53 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1827
+[24-Oct-2025 21:16:41 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1827
+[24-Oct-2025 21:17:10 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1827
+[24-Oct-2025 21:43:17 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1829
+[24-Oct-2025 22:12:50 Europe/Berlin] PHP Warning:  Undefined variable $initial_display_count in C:\xampp\htdocs\Content-upload - Copy\index.php on line 195
+[24-Oct-2025 22:12:50 Europe/Berlin] PHP Warning:  Undefined variable $page in C:\xampp\htdocs\Content-upload - Copy\index.php on line 196
+[24-Oct-2025 22:12:50 Europe/Berlin] PHP Warning:  Undefined variable $page in C:\xampp\htdocs\Content-upload - Copy\index.php on line 1240
+[24-Oct-2025 22:12:50 Europe/Berlin] PHP Warning:  Undefined variable $total_pages in C:\xampp\htdocs\Content-upload - Copy\index.php on line 1243
+[24-Oct-2025 22:12:50 Europe/Berlin] PHP Warning:  Undefined variable $scroll_load_count in C:\xampp\htdocs\Content-upload - Copy\index.php on line 1244
+[24-Oct-2025 22:13:17 Europe/Berlin] PHP Warning:  Undefined variable $initial_display_count in C:\xampp\htdocs\Content-upload - Copy\index.php on line 195
+[24-Oct-2025 22:13:17 Europe/Berlin] PHP Warning:  Undefined variable $page in C:\xampp\htdocs\Content-upload - Copy\index.php on line 196
+[24-Oct-2025 22:13:17 Europe/Berlin] PHP Warning:  Undefined variable $page in C:\xampp\htdocs\Content-upload - Copy\index.php on line 1240
+[24-Oct-2025 22:13:17 Europe/Berlin] PHP Warning:  Undefined variable $total_pages in C:\xampp\htdocs\Content-upload - Copy\index.php on line 1243
+[24-Oct-2025 22:13:17 Europe/Berlin] PHP Warning:  Undefined variable $scroll_load_count in C:\xampp\htdocs\Content-upload - Copy\index.php on line 1244
+[24-Oct-2025 22:13:51 Europe/Berlin] PHP Warning:  Undefined variable $total_pages in C:\xampp\htdocs\Content-upload - Copy\index.php on line 1248
+[24-Oct-2025 22:14:33 Europe/Berlin] PHP Warning:  Undefined variable $total_pages in C:\xampp\htdocs\Content-upload - Copy\index.php on line 1248
+[24-Oct-2025 22:14:35 Europe/Berlin] PHP Warning:  Undefined variable $total_pages in C:\xampp\htdocs\Content-upload - Copy\index.php on line 1248
+[24-Oct-2025 22:14:39 Europe/Berlin] PHP Warning:  Undefined variable $total_pages in C:\xampp\htdocs\Content-upload - Copy\index.php on line 1248
+[24-Oct-2025 22:25:20 Europe/Berlin] PHP Warning:  Undefined variable $total_pages in C:\xampp\htdocs\Content-upload - Copy\index.php on line 1243
+[24-Oct-2025 22:25:30 Europe/Berlin] PHP Warning:  Undefined variable $total_pages in C:\xampp\htdocs\Content-upload - Copy\index.php on line 1243
+[24-Oct-2025 22:30:28 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1829
+[24-Oct-2025 22:31:01 Europe/Berlin] PHP Fatal error:  Uncaught Error: Call to undefined function imagecreatefromjpeg() in C:\xampp\htdocs\Content-upload - Copy\upload.php:34
+Stack trace:
+#0 C:\xampp\htdocs\Content-upload - Copy\upload.php(114): compressAndSaveImage('C:\\xampp\\tmp\\ph...', 'C:/xampp/htdocs...', 'image/jpeg', 75)
+#1 {main}
+  thrown in C:\xampp\htdocs\Content-upload - Copy\upload.php on line 34
+[24-Oct-2025 22:31:05 Europe/Berlin] PHP Fatal error:  Uncaught Error: Call to undefined function imagecreatefromjpeg() in C:\xampp\htdocs\Content-upload - Copy\upload.php:34
+Stack trace:
+#0 C:\xampp\htdocs\Content-upload - Copy\upload.php(114): compressAndSaveImage('C:\\xampp\\tmp\\ph...', 'C:/xampp/htdocs...', 'image/jpeg', 75)
+#1 {main}
+  thrown in C:\xampp\htdocs\Content-upload - Copy\upload.php on line 34
+[24-Oct-2025 22:49:38 Europe/Berlin] PHP Warning:  Undefined variable $total_pages in C:\xampp\htdocs\Content-upload - Copy\index.php on line 1244
+[24-Oct-2025 22:49:41 Europe/Berlin] PHP Warning:  Undefined variable $total_pages in C:\xampp\htdocs\Content-upload - Copy\index.php on line 1244
+[24-Oct-2025 22:49:43 Europe/Berlin] PHP Warning:  Undefined variable $total_pages in C:\xampp\htdocs\Content-upload - Copy\index.php on line 1244
+[24-Oct-2025 22:50:51 Europe/Berlin] PHP Warning:  Undefined variable $total_pages in C:\xampp\htdocs\Content-upload - Copy\index.php on line 1243
+[24-Oct-2025 22:50:53 Europe/Berlin] PHP Warning:  Undefined variable $total_pages in C:\xampp\htdocs\Content-upload - Copy\index.php on line 1243
+[24-Oct-2025 22:52:09 Europe/Berlin] PHP Warning:  Undefined variable $total_pages in C:\xampp\htdocs\Content-upload - Copy\index.php on line 1243
+[24-Oct-2025 22:52:13 Europe/Berlin] PHP Warning:  Undefined variable $total_pages in C:\xampp\htdocs\Content-upload - Copy\index.php on line 1243
+[24-Oct-2025 22:57:08 Europe/Berlin] PHP Warning:  Undefined variable $total_pages in C:\xampp\htdocs\Content-upload - Copy\index.php on line 1243
+[24-Oct-2025 23:04:13 Europe/Berlin] PHP Warning:  Undefined variable $total_pages in C:\xampp\htdocs\Content-upload - Copy\index.php on line 1244
+[24-Oct-2025 23:04:19 Europe/Berlin] PHP Warning:  Undefined variable $total_pages in C:\xampp\htdocs\Content-upload - Copy\index.php on line 1244
+[24-Oct-2025 23:08:30 Europe/Berlin] Checking file: C:\xampp\htdocs\Content-upload - Copy/includes/uploads/68fbe2a580ebf6.40658336.jpg - Exists: true
+[24-Oct-2025 23:08:30 Europe/Berlin] Checking file: C:\xampp\htdocs\Content-upload - Copy/includes/uploads/68fbc4b491d1c6.48280995.webp - Exists: true
+[24-Oct-2025 23:08:30 Europe/Berlin] Checking file: C:\xampp\htdocs\Content-upload - Copy/includes/uploads/68fbc6b5b71870.70384556.png - Exists: true
+[24-Oct-2025 23:08:30 Europe/Berlin] Checking file: C:\xampp\htdocs\Content-upload - Copy/includes/uploads/68c451b65001d1.95971423.jpg - Exists: true
+[24-Oct-2025 23:08:30 Europe/Berlin] Checking file: C:\xampp\htdocs\Content-upload - Copy/includes/uploads/68fbc851918b47.09725955.jpg - Exists: true
+[24-Oct-2025 23:08:30 Europe/Berlin] Checking file: C:\xampp\htdocs\Content-upload - Copy/includes/uploads/68c1f4efd912c9.96435887.jpg - Exists: true
+[24-Oct-2025 23:08:30 Europe/Berlin] Checking file: C:\xampp\htdocs\Content-upload - Copy/includes/uploads/68c077e3cd14a4.92751695.png - Exists: true
+[25-Oct-2025 12:11:12 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1829
+[25-Oct-2025 12:11:56 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1829
+[25-Oct-2025 17:13:47 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1829
+[25-Oct-2025 17:20:40 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1829
+[25-Oct-2025 18:24:46 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1829
+[16-Nov-2025 21:26:05 Europe/Berlin] PHP Warning:  Trying to access array offset on value of type null in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1814
+[16-Nov-2025 21:26:05 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1814
+[16-Nov-2025 21:26:05 Europe/Berlin] PHP Warning:  Trying to access array offset on value of type null in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1815
+[16-Nov-2025 21:26:05 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1815
+[16-Nov-2025 21:26:05 Europe/Berlin] PHP Warning:  Trying to access array offset on value of type null in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1816
+[16-Nov-2025 21:26:05 Europe/Berlin] PHP Deprecated:  strtotime(): Passing null to parameter #1 ($datetime) of type string is deprecated in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1816
+[16-Nov-2025 21:26:05 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1829
+[16-Nov-2025 21:26:34 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1829
+[16-Nov-2025 21:26:45 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1829
+[16-Nov-2025 21:26:56 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1829
+[16-Nov-2025 21:37:39 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1829
+[16-Nov-2025 21:37:55 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1829
+[16-Nov-2025 21:38:12 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1829
+[16-Nov-2025 21:38:25 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1829
+[16-Nov-2025 21:38:37 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1829
+[16-Nov-2025 22:04:28 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1829
+[16-Nov-2025 22:04:34 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1829
+[16-Nov-2025 22:05:57 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1829
+[16-Nov-2025 22:11:14 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1829
+[16-Nov-2025 22:24:35 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1829
+[17-Nov-2025 21:36:14 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1829
+[17-Nov-2025 21:36:48 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1829
+[17-Nov-2025 21:36:57 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1829
+[17-Nov-2025 21:41:53 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1829
+[17-Nov-2025 21:41:57 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1829
+[17-Nov-2025 21:42:30 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1829
+[17-Nov-2025 21:44:46 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1829
+[17-Nov-2025 21:45:07 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1829
+[17-Nov-2025 21:48:24 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1829
+[17-Nov-2025 21:51:06 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1829
+[17-Nov-2025 21:53:50 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1829
+[17-Nov-2025 21:54:10 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1829
+[17-Nov-2025 21:54:35 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1829
+[19-Nov-2025 20:36:08 Europe/Berlin] No connection could be made because the target machine actively refused it
+[19-Nov-2025 20:40:07 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1829
+[19-Nov-2025 20:41:14 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1829
+[19-Nov-2025 20:41:46 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1829
+[19-Nov-2025 21:20:56 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1830
+[19-Nov-2025 21:21:03 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1830
+[19-Nov-2025 21:21:14 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1829
+[19-Nov-2025 21:30:47 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1829
+[22-Nov-2025 00:32:35 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1829
+[22-Nov-2025 00:32:52 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1829
+[22-Nov-2025 00:32:54 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1829
+[22-Nov-2025 00:32:58 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1829
+[22-Nov-2025 00:34:22 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1829
+[22-Nov-2025 00:34:31 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1829
+[22-Nov-2025 00:38:28 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1829
+[22-Nov-2025 00:38:39 Europe/Berlin] PHP Warning:  Undefined variable $row_index in C:\xampp\htdocs\Content-upload - Copy\index.php on line 334
+[22-Nov-2025 00:38:39 Europe/Berlin] PHP Warning:  Undefined variable $row_index in C:\xampp\htdocs\Content-upload - Copy\index.php on line 508
+[22-Nov-2025 00:40:45 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1829
+[22-Nov-2025 01:04:31 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1820
+[22-Nov-2025 01:04:40 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1820
+[22-Nov-2025 01:11:45 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1829
+[22-Nov-2025 01:11:52 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1829
+[22-Nov-2025 01:11:57 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 352
+[22-Nov-2025 01:12:03 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 352
+[22-Nov-2025 01:12:11 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1830
+[22-Nov-2025 01:13:01 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1830
+[22-Nov-2025 01:18:41 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1829
+[22-Nov-2025 01:24:52 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1829
+[22-Nov-2025 01:26:52 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1829
+[22-Nov-2025 01:27:19 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1829
+[22-Nov-2025 01:27:27 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1829
+[22-Nov-2025 01:28:57 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1829
+[22-Nov-2025 01:31:44 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1820
+[22-Nov-2025 01:31:54 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1829
+[22-Nov-2025 01:32:03 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1829
+[22-Nov-2025 01:32:27 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1829

@@ -1,10 +1,18 @@
 <?php
 require_once 'includes/config.php';
 
+// Set pagination variables
+$page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int)$_GET['page'] : 1;
+$items_per_page = 12; // Initial load count
+$offset = ($page - 1) * $items_per_page;
+
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ajax'])) {
+if (
+    ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ajax'])) ||
+    (isset($_GET['ajax']) && $_GET['ajax'] === '1')
+) {
     header('Content-Type: application/json');
 
     try {
@@ -149,8 +157,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ajax'])) {
     }
 }
 
-require_once 'includes/header.php';
-
 $search_query = isset($_GET['search']) ? trim($_GET['search']) : '';
 $current_user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 0;
 
@@ -191,8 +197,11 @@ try {
             $types .= 'ssss';
         }
 
-        $query .= " GROUP BY uploads.id ORDER BY upload_date DESC";
+        $query .= " GROUP BY uploads.id ORDER BY upload_date DESC LIMIT ? OFFSET ?";
+        array_push($params, $items_per_page, $offset);
+        $types .= 'ii';
 
+        
         $stmt = $conn->prepare($query);
         if ($stmt) {
             $stmt->bind_param($types, ...$params);
@@ -205,11 +214,10 @@ try {
         $query = "SELECT uploads.*, users.username, users.profile_pic 
                   FROM uploads 
                   JOIN users ON uploads.user_id = users.id 
-                  WHERE (? = '' OR uploads.title LIKE ? OR uploads.description LIKE ? OR users.username LIKE ?)
-                  ORDER BY upload_date DESC";
+                  WHERE (? = '' OR uploads.title LIKE ? OR uploads.description LIKE ? OR users.username LIKE ?)";
         $stmt = $conn->prepare($query);
         $search_param = "%$search_query%";
-        $stmt->bind_param("ssss", $search_query, $search_param, $search_param, $search_param);
+        $stmt->bind_param("ssssii", $search_query, $search_param, $search_param, $search_param, $items_per_page, $offset);
         $stmt->execute();
         $result = $stmt->get_result();
 
@@ -223,6 +231,23 @@ try {
         }
     }
 
+    // If it's an AJAX request for more items, output JSON and exit.
+    if (isset($_GET['ajax']) && $_GET['ajax'] === '1') {
+        $items = $result->fetch_all(MYSQLI_ASSOC);
+        echo json_encode(['success' => true, 'items' => $items, 'has_more' => count($items) === $items_per_page]);
+        exit;
+    }
+
+    // For initial page load, include the header.
+    require_once 'includes/header.php';
+
+    // Fetch all items for the initial page render
+    $items = $result->fetch_all(MYSQLI_ASSOC);
+    if (empty($search_query)) {
+        shuffle($items);
+    }
+
+    // Get total count for pagination logic in JS
     $count_query = "SELECT COUNT(DISTINCT uploads.id) as total 
                    FROM uploads 
                    JOIN users ON uploads.user_id = users.id";
@@ -303,13 +328,8 @@ try {
     </div>
 
     <div class="masonry-grid" id="masonryGrid" aria-live="polite" aria-relevant="additions">
-        <?php if($result->num_rows > 0): ?>
-            <?php
-            $items = $result->fetch_all(MYSQLI_ASSOC);
-            if (empty($search_query)) {
-                shuffle($items);
-            }
-            ?>
+        <div class="grid-sizer"></div>
+        <?php if(count($items) > 0): ?>
             <?php foreach ($items as $row): ?>
                 <?php
                 $file_ext = strtolower(pathinfo($row['filename'], PATHINFO_EXTENSION));
@@ -352,10 +372,10 @@ try {
                                 <div class="video-thumbnail-container">
                                     <div class="image-skeleton"></div>
                                     <?php if(!empty($thumbnail_to_show)): 
-                                        $thumbnail_width = '';
-                                        $thumbnail_height = '';
+                                        $thumbnail_width = 640; // Default
+                                        $thumbnail_height = 360; // Default
                                         if (!empty($thumbnail_to_show) && file_exists($absolute_thumbnail_path)) {
-                                            $thumb_size = @getimagesize($absolute_thumbnail_path);
+                                            $thumb_size = getimagesize($absolute_thumbnail_path);
                                             if ($thumb_size && $thumb_size[0] > 0 && $thumb_size[1] > 0) {
                                                 $thumbnail_width = $thumb_size[0];
                                                 $thumbnail_height = $thumb_size[1];
@@ -373,7 +393,7 @@ try {
                                              width="<?php echo $thumbnail_width; ?>"
                                              height="<?php echo $thumbnail_height; ?>"
                                              <?php endif; ?>
-                                             onload="this.classList.add('loaded'); this.previousElementSibling.style.display='none';">
+                                             onload="this.classList.add('loaded'); this.previousElementSibling.style.opacity='0';">
                                     <?php else: ?>
                                         <video width="100%" preload="metadata" muted 
                                                onloadeddata="this.classList.add('loaded'); this.previousElementSibling.style.display='none';"
@@ -390,16 +410,15 @@ try {
                                 <?php
                                 // Calculate aspect ratio to prevent layout shift
                                 $aspect_ratio_style = 'padding-top: 100%;';
+                                $image_size = @getimagesize($absolute_path);
                                 if (file_exists($absolute_path)) {
-                                    $image_size = @getimagesize($absolute_path);
                                     if ($image_size && $image_size[0] > 0 && $image_size[1] > 0) {
-                                        $aspect_ratio_style = 'padding-top: ' . (($image_size[1] / $image_size[0]) * 100) . '%;';
+                                        $aspect_ratio_style = 'padding-top: ' . ($image_size[1] / $image_size[0] * 100) . '%;';
                                     }
                                 }
                                 ?>
                                 <div class="image-aspect-ratio-container" style="<?php echo $aspect_ratio_style; ?>">
-                                    <div class="image-skeleton"></div>
-                                    <img src="<?php echo $display_path; ?>?quality=70" 
+                                    <img src="<?php echo $display_path; ?>?quality=high" 
                                          alt="<?php echo htmlspecialchars($row['title']); ?>"
                                          loading="lazy"
                                          decoding="async"
@@ -407,7 +426,7 @@ try {
                                          width="<?php echo $image_size[0]; ?>"
                                          height="<?php echo $image_size[1]; ?>"
                                          <?php endif; ?>
-                                         onload="this.classList.add('loaded'); this.previousElementSibling.style.opacity = '0';">
+                                         class="lazy-image">
                                 </div>
                             <?php endif; ?>
                         <?php else: ?>
@@ -460,6 +479,18 @@ try {
         <?php else: ?>
             <p class="no-content">No content found. Try adjusting your search or <a href="upload.php">upload something</a>!</p>
         <?php endif; ?>
+    </div>
+    <div id="loader" class="infinite-scroll-loader" style="display: none;" aria-label="Loading more content">
+        <div class="loader">
+            <span></span><span></span><span></span><span></span><span></span><span></span>
+        </div>
+    </div>
+
+    <div id="load-more-container" class="load-more-container" style="display: none;">
+        <p id="load-error-message" style="display: none; color: #dc3545; margin-bottom: 10px;"></p>
+        <button id="load-more-btn" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Load More
+        </button>
     </div>
 </div>
 
@@ -545,6 +576,12 @@ try {
         animation: skeletonShimmer 1.5s infinite;
         z-index: 1;
         transition: opacity 0.3s;
+    }
+
+    .infinite-scroll-loader {
+        text-align: center;
+        padding: 20px;
+        width: 100%;
     }
 
     @keyframes skeletonShimmer {
@@ -686,23 +723,32 @@ try {
     
     /* Pinterest-Style Masonry Grid */
     .masonry-grid {
-        column-count: 4;
-        column-gap: 20px;
         margin: 0 auto;
         max-width: 1400px;
+        position: relative; /* Required for absolute positioning of items */
+    }
+
+    /* Gutter for masonry items */
+    .masonry-grid:after {
+        content: '';
+        display: block;
+        clear: both;
+    }
+
+    .grid-sizer,
+    .masonry-item {
+        width: 23%; /* Default for 4 columns */
     }
 
     .masonry-item {
-        display: inline-block;
-        width: 100%;
         margin-bottom: 20px;
-        break-inside: avoid;
-        position: relative;
         border-radius: 8px;
         overflow: hidden;
         background: white;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         transition: transform 0.3s ease, box-shadow 0.3s ease;
+        /* Removed break-inside and display: inline-block */
+        /* Masonry.js will handle positioning */
     }
 
     .masonry-item:hover {
@@ -943,6 +989,24 @@ try {
         object-fit: cover;
     }
 
+    .load-more-container {
+        text-align: center;
+        padding: 20px;
+    }
+
+    .load-more-container .btn-primary {
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        font-size: 1rem;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+    .load-more-container .btn-primary:hover {
+        background-color: var(--primary-light);
+    }
 /* Modal Styles */
 .modal {
     display: none; /* Hidden by default */
@@ -1036,18 +1100,24 @@ try {
 
     /* Responsive adjustments */
     @media (max-width: 1200px) {
-        .masonry-grid {
-            column-count: 3;
+        .grid-sizer,
+        .masonry-item {
+            width: 31%; /* 3 columns */
         }
     }
 
     @media (max-width: 900px) {
-        .masonry-grid {
-            column-count: 2;
+        .grid-sizer,
+        .masonry-item {
+            width: 48%; /* 2 columns */
         }
 
         .masonry-overlay {
             padding: 12px;
+        }
+
+        .masonry-item {
+            margin-bottom: 15px;
         }
 
         .masonry-overlay h3 {
@@ -1101,14 +1171,8 @@ try {
     }
 
     @media (max-width: 768px) {
-        .masonry-grid {
-            column-count: 2; /* Adjust column count for smaller screens */
-            column-gap: 10px; /* Reduce spacing between image cards */
-        }
-
         .masonry-item {
             margin-bottom: 10px; /* Reduce spacing between image cards */
-        }
 
         .save-btn {
             display: none; /* Hide save button */
@@ -1166,11 +1230,18 @@ try {
         .masonry-overlay .description {
             margin-bottom: 1px; /* Even smaller gap for very small screens */
         }
+
+    .masonry-footer {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
     }
 
     @media (max-width: 400px) {
-        .masonry-grid {
-            column-count: 1;
+        .grid-sizer,
+        .masonry-item {
+            width: 98%; /* 1 column */
         }
 
         .search-section {
@@ -1200,20 +1271,88 @@ try {
 </style>
 
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    const loadingOverlay = document.getElementById('loading-overlay');
+document.addEventListener('DOMContentLoaded', function() {
+    // --- Page Load, Infinite Scroll, and Actions ---
+    let isLoading = false;
+    let currentPage = <?php echo $page; ?>;
     const container = document.querySelector('.container');
+    const lazyImages = document.querySelectorAll('img.lazy-image');
+    const loaderEl = document.getElementById('loader');
+    const loadMoreContainer = document.getElementById('load-more-container');
+    const grid = document.getElementById('masonryGrid');
+    let msnry;
+
+    // Initialize Masonry after images are loaded
+    imagesLoaded(grid, function () {
+        msnry = new Masonry(grid, { // ... Masonry options
+            itemSelector: '.masonry-item', columnWidth: '.grid-sizer', gutter: 20, percentPosition: true, transitionDuration: '0.4s'
+        });
+    });
+
+    // --- Robust Lazy Loading with IntersectionObserver Fallback ---
+    if ('loading' in HTMLImageElement.prototype) {
+        // Native lazy loading is supported.
+        // The browser will handle it. We just need to ensure images fade in.
+        lazyImages.forEach(img => {
+            // Use a temporary image to detect when the real one has loaded
+            const tempImg = new Image();
+            tempImg.src = img.src;
+            tempImg.onload = () => {
+                img.classList.add('loaded');
+                if (msnry) {
+                    imagesLoaded(img, () => msnry.layout());
+                }
+            };
+        });
+    } else {
+        // Fallback to IntersectionObserver
+        const lazyLoad = (target) => {
+            const io = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const img = entry.target;
+                        // The src is already the high-quality one, we just need to load it.
+                        img.src = img.src; // Re-assigning src triggers load
+                        img.onload = () => {
+                            img.classList.add('loaded');
+                            if (msnry) {
+                                imagesLoaded(img, () => msnry.layout());
+                            }
+                        };
+                        observer.unobserve(img);
+                    }
+                });
+            });
+            io.observe(target);
+        };
+        lazyImages.forEach(lazyLoad);
+    }
     
-    // Hide loading overlay as soon as DOM is ready.
-    if (loadingOverlay) {
-        loadingOverlay.style.opacity = '0';
-        setTimeout(function() {
-            loadingOverlay.style.display = 'none';
-        }, 500);
-    }
-    if (container) {
-        container.style.opacity = '1';
-    }
+    const handlePageLoad = () => {
+        const loadingOverlay = document.getElementById('loading-overlay');
+        if (loadingOverlay) {
+            loadingOverlay.style.opacity = '0'; // Start fade out
+            setTimeout(function() {
+                loadingOverlay.style.display = 'none';
+                if (container) container.style.opacity = '1';
+            }, 500); // Match CSS transition
+        } else if (container) {
+            container.style.opacity = '1';
+        }
+    };
+
+    window.addEventListener('load', handlePageLoad);
+
+    // Fallback: hide overlay after 5 seconds in case 'load' event fails
+    setTimeout(function() {
+        const loadingOverlay = document.getElementById('loading-overlay');
+        if (container && (!container.style.opacity || container.style.opacity === '0')) {
+            handlePageLoad();
+        } else if (loadingOverlay && loadingOverlay.style.display !== 'none') {
+             loadingOverlay.style.opacity = '0';
+             setTimeout(() => { loadingOverlay.style.display = 'none'; }, 500);
+        }
+    }, 5000);
 
     const clearSearch = document.querySelector('.clear-search');
     if (clearSearch) {
@@ -1221,10 +1360,173 @@ document.addEventListener('DOMContentLoaded', function () {
             window.location.href = '?';
         });
     }
+
+    // --- Infinite Scroll ---
+    const observer = new IntersectionObserver(
+        (entries) => {
+            if (entries[0].isIntersecting && !isLoading) {
+                fetchMoreItems();
+            }
+        }, { rootMargin: "0px 0px 400px 0px" }
+    );
     
+    if (loaderEl) {
+        observer.observe(loaderEl);
+    }
+
+    const loadMoreBtn = document.getElementById('load-more-btn');
+    if (loadMoreBtn) {
+        loadMoreBtn.addEventListener('click', () => {
+            loadMoreContainer.style.display = 'none';
+            fetchMoreItems();
+        });
+    }
+
+    async function fetchMoreItems() {
+        const params = new URLSearchParams(window.location.search);
+        isLoading = true;
+        currentPage++;
+
+        params.set('page', currentPage);
+        params.set('ajax', '1');
+
+        let data;
+        try {
+            const response = await fetch(`index.php?${params.toString()}`);
+            loaderEl.style.display = 'block';
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const data = await response.json();
+
+            if (data && data.success && data.items.length > 0) {
+                const fragment = document.createDocumentFragment();
+                const newItems = [];
+                data.items.forEach(item => {
+                    const newItem = createMasonryItem(item);
+                    fragment.appendChild(newItem);
+                    newItems.push(newItem);
+                });
+                grid.appendChild(fragment);
+
+                // Use imagesLoaded for new items, then append to Masonry
+                imagesLoaded(newItems, function() {
+                    msnry.appended(newItems);
+                });
+                initLikeButtons();
+                initSaveButtons();
+            }
+
+            if (!data.has_more) {
+                observer.unobserve(loaderEl);
+            }
+
+        } catch (error) {
+            console.error("Failed to fetch more items:", error);
+            // Show error message and load more button
+            const errorMessageEl = document.getElementById('load-error-message');
+            if (errorMessageEl) {
+                errorMessageEl.textContent = 'Failed to load content. Please try again.';
+                errorMessageEl.style.display = 'block';
+            }
+            if (loadMoreContainer) {
+                loadMoreContainer.style.display = 'block';
+            }
+            observer.unobserve(loaderEl); // Stop observing on error
+        } finally {
+            isLoading = false;
+            loaderEl.style.display = 'none';
+        }
+    }
+
+    function createMasonryItem(row) {
+        const file_ext = (row.filename.split('.').pop() || '').toLowerCase();
+        const is_video = ['mp4', 'mov', 'avi', 'wmv', 'webm'].includes(file_ext);
+        const display_path = '<?php echo BASE_URL; ?>/' + row.filepath;
+
+        let thumbnail_to_show = '';
+        if (is_video && row.thumbnail_path) {
+            let thumbnail_display_path = row.thumbnail_path.replace(/\\/g, '/');
+            if (!thumbnail_display_path.startsWith('/')) {
+                thumbnail_display_path = '/' + thumbnail_display_path;
+            }
+            thumbnail_to_show = thumbnail_display_path;
+        }
+
+        let initials = '';
+        if (row.username) {
+            const names = row.username.split(' ');
+            initials = (names[0][0] || '').toUpperCase();
+            if (names.length > 1) {
+                initials += (names[names.length - 1][0] || '').toUpperCase();
+            }
+        }
+
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'masonry-item';
+        itemDiv.dataset.uploadId = row.id;
+
+        let mediaHtml;
+        if (is_video) {
+            mediaHtml = `
+                <div class="video-thumbnail-container">
+                    <div class="image-skeleton"></div>
+                    ${thumbnail_to_show ? `
+                        <img src="${thumbnail_to_show}?quality=70" alt="Thumbnail for ${row.title}" loading="lazy" decoding="async" onload="this.classList.add('loaded'); this.previousElementSibling.style.display='none';">
+                    ` : `
+                        <video width="100%" preload="metadata" muted onloadeddata="this.classList.add('loaded'); this.previousElementSibling.style.display='none';" playsinline>
+                            <source src="${display_path}#t=${row.thumbnail_time}" type="video/${file_ext}">
+                        </video>
+                    `}
+                    <div class="video-play-icon" aria-label="Play video"><i class="fas fa-play" aria-hidden="true"></i></div>
+                </div>`;
+        } else {
+            mediaHtml = `
+                <div class="image-aspect-ratio-container" style="padding-top: 100%;">
+                    <div class="image-skeleton"></div>
+                    <img src="${display_path}?quality=70" alt="${row.title}" loading="lazy" decoding="async" onload="
+                        this.classList.add('loaded'); 
+                        this.previousElementSibling.style.opacity = '0';
+                        // Set aspect ratio on the container after image loads to help Masonry
+                        const aspectRatio = this.naturalHeight / this.naturalWidth;
+                        if (aspectRatio) {
+                            this.parentElement.style.paddingTop = (aspectRatio * 100) + '%';
+                        }
+                        if (msnry) { msnry.layout(); }
+                    ">
+                </div>`;
+        }
+
+        itemDiv.innerHTML = `
+            <a href="view.php?id=${row.id}" class="masonry-content" tabindex="0">
+                ${mediaHtml}
+                <div class="masonry-overlay">
+                    <h3>${row.title}</h3>
+                    <p class="description">${row.description.substring(0, 100)}</p>
+                    <div class="masonry-footer">
+                        <div class="user-info">
+                            <div class="user-avatar" aria-label="User avatar">
+                                ${row.profile_pic ? `<img src="<?php echo BASE_URL; ?>/${row.profile_pic}" alt="${row.username}'s profile picture" class="user-profile-pic" loading="lazy" decoding="async" onload="this.classList.add('loaded');">` : `<div class="user-avatar-initials" aria-hidden="true">${initials}</div>`}
+                            </div>
+                            <div class="user-meta">
+                                <span class="username">${row.username}</span>
+                                <span class="upload-date">${new Date(row.upload_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                            </div>
+                        </div>
+                        <div class="item-actions">
+                            <button class="like-btn ${row.user_liked ? 'liked' : ''}" data-upload-id="${row.id}" aria-label="Like"><i class="fas fa-heart" aria-hidden="true"></i><span class="like-count">${row.like_count}</span></button>
+                            <button class="save-btn ${row.user_saved ? 'saved' : ''}" data-upload-id="${row.id}" aria-label="Save"><i class="fas fa-bookmark" aria-hidden="true"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </a>`;
+        return itemDiv;
+    }
+    
+    // --- Like/Save Button Logic ---
     function initLikeButtons() {
         document.querySelectorAll('.like-btn').forEach(button => {
-            button.removeEventListener('click', button._likeHandler);
+            if (button._likeHandler) return; // Already initialized
 
             button._likeHandler = async function (e) {
                 e.preventDefault();
@@ -1317,7 +1619,7 @@ document.addEventListener('DOMContentLoaded', function () {
     
     function initSaveButtons() {
         document.querySelectorAll('.save-btn').forEach(button => {
-            button.removeEventListener('click', button._saveHandler);
+            if (button._saveHandler) return; // Already initialized
 
             button._saveHandler = async function (e) {
                 e.preventDefault();
@@ -1456,6 +1758,10 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 </script>
+
+<!-- Masonry & ImagesLoaded CDN -->
+<script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.min.js"></script>
+<script src="https://unpkg.com/imagesloaded@5/imagesloaded.pkgd.min.js"></script>
 
 <?php require_once 'includes/footer.php'; ?>
 

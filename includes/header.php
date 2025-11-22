@@ -32,15 +32,22 @@ if ($user_id) {
     <link rel="icon" href="/assets/vs-icon.png" type="image/png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="assets/css/style.css">
-    
+    <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-VBZ9W1J7PL"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-VBZ9W1J7PL');
+</script>
     <style>
-        /* Header Styles */
-        .header { /* This is the main <header> tag */
-            background-color: rgba(255, 255, 255, 0.7); /* Semi-transparent white */
-            backdrop-filter: blur(10px); /* Frosted glass effect */
-            -webkit-backdrop-filter: blur(10px); /* For Safari */
-            border: 1px solid rgba(255, 255, 255, 0.3); /* Subtle white border */
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1); /* Keep existing shadow */
+        .header { 
+            background-color: rgba(255, 255, 255, 0.7); 
+            backdrop-filter: blur(10px); 
+            -webkit-backdrop-filter: blur(10px); 
+            border: 1px solid rgba(255, 255, 255, 0.3); 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1); 
             position: sticky;
             top: 15px;
             z-index: 1000;
@@ -50,19 +57,18 @@ if ($user_id) {
             border-radius: 50px;
         }
         
-        .header-container { /* This will be the inner flex container */
+        .header-container {
             display: flex;
             align-items: center;
-            /* Remove justify-content: space-between; */
-            /* Remove max-width, margin, padding as they are on .header now */
+           
         }
         
         .header-left, .header-right {
             display: flex;
             align-items: center;
-            gap: 10px; /* Gap between icons */
-            width: 60px; /* Fixed width for balance */
-            flex-shrink: 0; /* Prevent shrinking */
+            gap: 10px;
+            width: 60px; 
+            flex-shrink: 0; 
         }
         .header-left {
             justify-content: flex-start;
@@ -72,13 +78,12 @@ if ($user_id) {
         }
 
         .header-center {
-            flex: 1; /* Takes remaining space */
+            flex: 1;
             display: flex;
-            justify-content: center; /* Center logo */
+            justify-content: center;
             align-items: center;
         }
 
-        /* Logo styles */
         .logo a {
             font-size: 1.8rem;
             font-weight: 700;
@@ -99,8 +104,6 @@ if ($user_id) {
             color: black;
         }
 
-        /* Icon button styles (from old header, keep as is) */
-        /* Re-using .nav-link for general icon styling */
         .nav-link {
             text-decoration: none;
             color: #333;
@@ -108,24 +111,21 @@ if ($user_id) {
             transition: all 0.3s ease;
             display: flex;
             align-items: center;
-            justify-content: center; /* Center icon within its padding */
-            padding: 0.6rem; /* Adjusted padding for circular buttons */
-            border-radius: 50%; /* Make buttons circular */
+            justify-content: center;
+            padding: 0.6rem;
+            border-radius: 50%;
             font-size: 0.95rem;
-            width: 40px; /* Fixed width for circular button */
-            height: 40px; /* Fixed height for circular button */
+            width: 40px;
+            height: 40px;
         }
         .nav-link:hover {
             color: #4361ee;
-            background-color: #f0f0f0; /* Add hover background */
+            background-color: #f0f0f0;
         }
         .nav-link i {
             font-size: 1.3rem;
         }
-
-        /* Profile Picture Styles */
         .profile-pic-container {
-            /* No margin-left here, gap handles spacing */
         }
         .profile-pic-link {
             display: block;
@@ -157,7 +157,6 @@ if ($user_id) {
             font-size: 1rem;
         }
 
-        /* Responsive Styles */
         @media (max-width: 768px) {
             .header {
                 padding: 8px 15px;
@@ -175,19 +174,19 @@ if ($user_id) {
                 font-size: 1.5rem;
             }
             .nav-link {
-                width: 35px;
-                height: 35px;
-                padding: 0.5rem;
+                width: 40px;
+                height: 40px;
+                padding: 0.6rem;
             }
             .nav-link i {
-                font-size: 1.1rem;
+                font-size: 1.3rem;
             }
             .profile-pic-link {
-                width: 35px;
-                height: 35px;
+                width: 40px;
+                height: 40px;
             }
             .header-avatar-initials {
-                font-size: 0.8rem;
+                font-size: 1rem;
             }
         }
         
@@ -199,24 +198,6 @@ if ($user_id) {
             }
             .logo a {
                 font-size: 1.3rem;
-            }
-            .logo-icon {
-                font-size: 1.3rem;
-            }
-            .nav-link {
-                width: 30px;
-                height: 30px;
-                padding: 0.4rem;
-            }
-            .nav-link i {
-                font-size: 1rem;
-            }
-            .profile-pic-link {
-                width: 30px;
-                height: 30px;
-            }
-            .header-avatar-initials {
-                font-size: 0.7rem;
             }
         }
     </style>

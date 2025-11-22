@@ -1,10 +1,22 @@
-<?php
+a<?php
 require_once 'includes/config.php';
 $page_title = 'Terms of Service - VisualShare';
 require_once 'includes/header.php';
 ?>
 
-<div class="container">
+<!-- Loading overlay -->
+<div id="loading-overlay" class="loading-overlay">
+    <div class="loader">
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+</div>
+
+<div class="container main-container">
     <div class="terms-page">
         <div class="terms-header">
             <h1>Terms of Service</h1>
@@ -133,6 +145,61 @@ require_once 'includes/header.php';
 </div>
 
 <style>
+.main-container {
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+}
+/* Loading Overlay Styles */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.95);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    transition: opacity 0.5s ease;
+}
+
+/* From Uiverse.io by cosnametv */
+.loader {
+    --color: #4361ee;
+    --size: 70px;
+    width: var(--size);
+    height: var(--size);
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 5px;
+}
+
+.loader span {
+    width: 100%;
+    height: 100%;
+    background-color: var(--color);
+    animation: keyframes-blink 0.6s alternate infinite linear;
+}
+
+.loader span:nth-child(1) { animation-delay: 0ms; }
+.loader span:nth-child(2) { animation-delay: 200ms; }
+.loader span:nth-child(3) { animation-delay: 300ms; }
+.loader span:nth-child(4) { animation-delay: 400ms; }
+.loader span:nth-child(5) { animation-delay: 500ms; }
+.loader span:nth-child(6) { animation-delay: 600ms; }
+
+@keyframes keyframes-blink {
+    0% {
+        opacity: 0.3;
+        transform: scale(0.5) rotate(5deg);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
 .terms-page {
     max-width: 1000px;
     margin: 0 auto;
@@ -224,4 +291,33 @@ require_once 'includes/header.php';
 }
 </style>
 
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Hide loading overlay when page is fully loaded
+    window.addEventListener('load', function() {
+        const loadingOverlay = document.getElementById('loading-overlay');
+        const container = document.querySelector('.main-container');
+        
+        if (loadingOverlay) {
+            loadingOverlay.style.opacity = '0';
+            setTimeout(function() {
+                loadingOverlay.style.display = 'none';
+                if (container) container.style.opacity = '1';
+            }, 500);
+        } else if (container) {
+            container.style.opacity = '1';
+        }
+    });
+
+    // Fallback: hide overlay after 5 seconds
+    setTimeout(function() {
+        const loadingOverlay = document.getElementById('loading-overlay');
+        const container = document.querySelector('.main-container');
+        if (loadingOverlay && loadingOverlay.style.display !== 'none') {
+            loadingOverlay.style.opacity = '0';
+            setTimeout(() => { loadingOverlay.style.display = 'none'; if(container) container.style.opacity = '1'; }, 500);
+        }
+    }, 5000);
+});
+</script>
 <?php include 'includes/footer.php'; ?>

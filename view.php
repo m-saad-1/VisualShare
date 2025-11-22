@@ -713,6 +713,27 @@ body {
     font-weight: 500;
 }
 
+.comment-login-prompt {
+    text-align: center;
+    padding: 2rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    margin-bottom: 2.5rem;
+}
+
+.comment-login-prompt p {
+    margin: 0;
+    font-size: 1.1rem;
+    color: #555;
+}
+
+.comment-login-prompt a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s;
+}
+
 /* Loading state */
 .comment-loading {
     text-align: center;
@@ -1272,7 +1293,12 @@ body.modal-open {
             <?php else: ?>
                 <div class="image-container">
                     <div class="skeleton-loader"></div>
-                    <img src="<?php echo $display_path; ?>" alt="<?php echo htmlspecialchars($upload['title']); ?>" onclick="openModal('<?php echo $display_path; ?>')" style="cursor: pointer; display: none;">
+                    <img src="<?php echo $display_path; ?>" 
+                         alt="<?php echo htmlspecialchars($upload['title']); ?>" 
+                         onclick="openModal('<?php echo $display_path; ?>')" 
+                         style="cursor: pointer; opacity: 0;"
+                         loading="lazy"
+                         decoding="async">
                 </div>
             <?php endif; ?>
         </div>
@@ -1307,7 +1333,9 @@ body.modal-open {
                     <?php if(!empty($upload['profile_pic'])): ?>
                         <img src="<?php echo BASE_URL . '/' . htmlspecialchars($upload['profile_pic']); ?>" 
                              alt="<?php echo htmlspecialchars($upload['username']); ?>'s profile picture"
-                             class="user-profile-pic">
+                             class="user-profile-pic"
+                             loading="lazy"
+                             decoding="async">
                     <?php else: ?>
                         <div class="user-avatar-initials">
                             <?php echo $initials; ?>
@@ -1355,17 +1383,23 @@ body.modal-open {
             <div class="comments-section">
                 <h3><i class="fas fa-comments"></i> Comments</h3>
 
-                <div class="comment-form">
-                    <form id="commentForm">
-                        <div class="form-group">
-                            <textarea name="comment" placeholder="Share your thoughts about this content..." maxlength="500" required></textarea>
-                            <div class="form-actions">
-                                <span class="char-count"><span id="charCount">0</span>/500</span>
-                                <button type="submit"><i class="fas fa-paper-plane"></i> Post Comment</button>
+                <?php if ($current_user_id > 0): ?>
+                    <div class="comment-form">
+                        <form id="commentForm">
+                            <div class="form-group">
+                                <textarea name="comment" placeholder="Share your thoughts about this content..." maxlength="500" required></textarea>
+                                <div class="form-actions">
+                                    <span class="char-count"><span id="charCount">0</span>/500</span>
+                                    <button type="submit"><i class="fas fa-paper-plane"></i> Post Comment</button>
+                                </div>
                             </div>
-                        </div>
-                    </form>
-                </div>
+                        </form>
+                    </div>
+                <?php else: ?>
+                    <div class="comment-login-prompt">
+                        <p><a href="login.php?return=<?php echo urlencode($_SERVER['REQUEST_URI']); ?>">Sign in</a> or <a href="register.php">sign up</a> to leave a comment.</p>
+                    </div>
+                <?php endif; ?>
 
                 <div class="comments-list" id="commentsList">
                     <!-- Comments will be loaded here via JavaScript -->
@@ -1381,9 +1415,12 @@ body.modal-open {
                     ?>
                         <div class="related-item">
                             <a href="view.php?id=<?php echo $related['id']; ?>">
+                                <div class="image-skeleton"></div>
                                 <img src="<?php echo $related_path; ?>"
                                      alt="<?php echo htmlspecialchars($related['title']); ?>"
-                                     class="related-thumbnail">
+                                     class="related-thumbnail"
+                                     loading="lazy"
+                                     decoding="async">
                                 <div class="related-title"><?php echo htmlspecialchars($related['title']); ?></div>
                             </a>
                         </div>
@@ -1644,8 +1681,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (image) {
             const handleImageLoad = () => {
-                if (skeleton) skeleton.style.display = 'none';
-                image.style.display = 'block';
+                if (skeleton) skeleton.style.opacity = '0';
+                image.style.opacity = '1';
             };
 
             if (image.complete) {
@@ -1673,12 +1710,13 @@ document.addEventListener('DOMContentLoaded', function() {
         const url = `view.php?action=api&type=comment&upload_id=${uploadId}`;
         fetch(url)
             .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                if (!response.ok) {                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 return response.json();
             })
             .then(data => {
+                // ... (existing success handling) ...
+
                 if (data.success) {
                     if (data.comments.length === 0) {
                         commentsList.innerHTML = `
@@ -1693,7 +1731,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <a href="profile.php?id=${comment.user_id}" class="comment-user-link">
                                     <div class="comment-avatar">
                                         ${comment.profile_pic ?
-                                            `<img src="${comment.profile_pic}" alt="${comment.username}'s avatar">` :
+                                            `<img src="${comment.profile_pic}" alt="${comment.username}'s avatar" loading="lazy" decoding="async">` :
                                             `<div class="comment-avatar-initials">${comment.username.charAt(0).toUpperCase()}</div>`
                                         }
                                     </div>
@@ -1728,8 +1766,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             })
             .catch(error => {
-                console.error('Error loading comments:', error);
-                commentsList.innerHTML = `<div class="comment-error">
+                console.error('Error loading comments:', error.message);
+                commentsList.innerHTML = `<div class="comment-error" style="display:none;">
                     <i class="fas fa-exclamation-triangle"></i>
                     <p>Failed to load comments. Please try again later.</p>
                     <small style="color: #666; font-size: 0.8rem;">Error: ${error.message}</small>

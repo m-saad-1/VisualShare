@@ -13,6 +13,68 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
+/**
+ * Compresses and saves an image to the specified destination.
+ *
+ * @param string $source_path      The path to the source image.
+ * @param string $destination_path The path to save the compressed image.
+ * @param string $mime_type        The MIME type of the image.
+ * @param int    $quality          The compression quality (0-100 for JPEG/WEBP, 0-9 for PNG).
+ * @return bool True on success, false on failure.
+ */
+function compressAndSaveImage($source_path, $destination_path, $mime_type, $quality = 75) {
+    $info = getimagesize($source_path);
+    if ($info === false) {
+        return false; // Not a valid image
+    }
+
+    // Create image resource from source
+    switch ($mime_type) {
+        case 'image/jpeg':
+            $image = imagecreatefromjpeg($source_path);
+            break;
+        case 'image/png':
+            $image = imagecreatefrompng($source_path);
+            break;
+        case 'image/gif':
+            $image = imagecreatefromgif($source_path);
+            break;
+        case 'image/webp':
+            $image = imagecreatefromwebp($source_path);
+            break;
+        default:
+            return move_uploaded_file($source_path, $destination_path); // Fallback for unsupported types
+    }
+
+    if (!$image) {
+        return false;
+    }
+
+    // Save the compressed image
+    $success = false;
+    switch ($mime_type) {
+        case 'image/jpeg':
+            $success = imagejpeg($image, $destination_path, $quality);
+            break;
+        case 'image/png':
+            // PNG quality is 0-9, where 9 is max compression. Let's convert 0-100 to 0-9.
+            $png_quality = round(($quality / 100) * 9);
+            imagesavealpha($image, true); // Preserve transparency
+            $success = imagepng($image, $destination_path, $png_quality);
+            break;
+        case 'image/gif':
+            $success = imagegif($image, $destination_path);
+            break;
+        case 'image/webp':
+            imagesavealpha($image, true); // Preserve transparency
+            $success = imagewebp($image, $destination_path, $quality);
+            break;
+    }
+
+    imagedestroy($image);
+    return $success;
+}
+
 // Handle AJAX file upload
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
     header('Content-Type: application/json');
@@ -49,7 +111,25 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_SERVER['HTTP_X_REQUESTED_WI
             $filepath = UPLOAD_DIR . $filename;
             $webpath  = 'includes/uploads/' . $filename;
 
-            if (move_uploaded_file($file['tmp_name'], $filepath)) {
+            $upload_success = false;
+            // Check if the GD extension is loaded before attempting to compress
+            if (extension_loaded('gd') && function_exists('imagecreatefromstring')) {
+                if (compressAndSaveImage($file['tmp_name'], $filepath, $file_type, 75)) {
+                    $upload_success = true;
+                } else {
+                    $response['message'] = 'Failed to process and compress the image.';
+                }
+            } else {
+                // Fallback to simple move if GD is not available
+                // You should enable the 'gd' extension in your php.ini for compression to work.
+                if (move_uploaded_file($file['tmp_name'], $filepath)) {
+                    $upload_success = true;
+                } else {
+                    $response['message'] = 'Failed to move the uploaded file.';
+                }
+            }
+
+            if ($upload_success) {
                 chmod($filepath, 0644);
 
                 $query = "INSERT INTO uploads (user_id, filename, filepath, title, description) VALUES (?, ?, ?, ?, ?)";
@@ -88,10 +168,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_SERVER['HTTP_X_REQUESTED_WI
                     $response = ['success' => true, 'message' => 'Upload successful!', 'redirect' => 'index.php'];
                 } else {
                     $response['message'] = 'Failed to save upload details to the database.';
-                    unlink($filepath); // Clean up uploaded file
                 }
-            } else {
-                $response['message'] = 'Failed to move uploaded file.';
             }
         }
     } else {
@@ -108,6 +185,67 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_SERVER['HTTP_X_REQUESTED_WI
 require_once 'includes/header.php';
 ?>
 <style>
+    /* Loading Overlay Styles */
+    .loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.95);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+        transition: opacity 0.5s ease;
+    }
+
+    /* From Uiverse.io by cosnametv */
+    .loader {
+        --color: #4361ee;
+        --size: 70px;
+        width: var(--size);
+        height: var(--size);
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 5px;
+    }
+
+    .loader span {
+        width: 100%;
+        height: 100%;
+        background-color: var(--color);
+        animation: keyframes-blink 0.6s alternate infinite linear;
+    }
+
+    .loader span:nth-child(1) { animation-delay: 0ms; }
+    .loader span:nth-child(2) { animation-delay: 200ms; }
+    .loader span:nth-child(3) { animation-delay: 300ms; }
+    .loader span:nth-child(4) { animation-delay: 400ms; }
+    .loader span:nth-child(5) { animation-delay: 500ms; }
+    .loader span:nth-child(6) { animation-delay: 600ms; }
+
+    @keyframes keyframes-blink {
+        0% {
+            opacity: 0.3;
+            transform: scale(0.5) rotate(5deg);
+        }
+        50% {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    .main-container {
+        opacity: 0;
+        transition: opacity 0.5s ease-in-out;
+    }
+
+    /* Override for the upload form's own loader */
+    .upload-container .loading-overlay {
+        position: absolute;
+    }
+
     .upload-container {
         max-width: 800px;
         margin: 2rem auto;
@@ -258,7 +396,19 @@ require_once 'includes/header.php';
     }
 </style>
 
-<div class="upload-container">
+<!-- Page Loading overlay -->
+<div id="page-loading-overlay" class="loading-overlay">
+    <div class="loader">
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+</div>
+
+<div class="upload-container main-container">
     <!-- Loader Overlay -->
     <div class="loader-overlay" id="loaderOverlay">
         <div class="progress-container">
@@ -302,6 +452,33 @@ require_once 'includes/header.php';
 </div>
 
 <script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Hide loading overlay when page is fully loaded
+    window.addEventListener('load', function() {
+        const loadingOverlay = document.getElementById('page-loading-overlay');
+        const container = document.querySelector('.main-container');
+        
+        if (loadingOverlay) {
+            loadingOverlay.style.opacity = '0';
+            setTimeout(function() {
+                loadingOverlay.style.display = 'none';
+                if (container) container.style.opacity = '1';
+            }, 500);
+        } else if (container) {
+            container.style.opacity = '1';
+        }
+    });
+
+    // Fallback: hide overlay after 5 seconds
+    setTimeout(function() {
+        const loadingOverlay = document.getElementById('page-loading-overlay');
+        const container = document.querySelector('.main-container');
+        if (loadingOverlay && loadingOverlay.style.display !== 'none') {
+            loadingOverlay.style.opacity = '0';
+            setTimeout(() => { loadingOverlay.style.display = 'none'; if(container) container.style.opacity = '1'; }, 500);
+        }
+    }, 5000);
+});
 document.addEventListener('DOMContentLoaded', function() {
     const uploadForm = document.getElementById('uploadForm');
     const fileInput = document.getElementById('file');
