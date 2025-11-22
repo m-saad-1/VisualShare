@@ -1100,3 +1100,10 @@ Stack trace:
 [22-Nov-2025 01:31:54 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1829
 [22-Nov-2025 01:32:03 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1829
 [22-Nov-2025 01:32:27 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1829
+[22-Nov-2025 01:54:09 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1829
+[22-Nov-2025 21:33:38 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: MySQL server has gone away in C:\xampp\htdocs\Content-upload - Copy\dashboard.php:13
+Stack trace:
+#0 C:\xampp\htdocs\Content-upload - Copy\dashboard.php(13): mysqli->prepare('SELECT username...')
+#1 {main}
+  thrown in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 13
+[22-Nov-2025 22:12:37 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1829
