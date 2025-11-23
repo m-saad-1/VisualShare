@@ -22,7 +22,8 @@ if (!isset($_SESSION['user_id'])) {
  * @param int    $quality          The compression quality (0-100 for JPEG/WEBP, 0-9 for PNG).
  * @return bool True on success, false on failure.
  */
-function compressAndSaveImage($source_path, $destination_path, $mime_type, $quality = 75) {
+function compressAndSaveImage($source_path, $destination_path, $mime_type, $quality = 75)
+{
     $info = getimagesize($source_path);
     if ($info === false) {
         return false; // Not a valid image
@@ -173,7 +174,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_SERVER['HTTP_X_REQUESTED_WI
         }
     } else {
         $response['message'] = 'Please select an image to upload or an upload error occurred.';
-        if(isset($_FILES['file']['error'])) {
+        if (isset($_FILES['file']['error'])) {
             $response['error_code'] = $_FILES['file']['error'];
         }
     }

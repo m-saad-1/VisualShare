@@ -1,17 +1,17 @@
 <?php
 require_once 'includes/config.php';
 
-if(isset($_SESSION['user_id'])) {
+if (isset($_SESSION['user_id'])) {
     header("Location: index.php");
     exit;
 }
 
 $error = '';
-if($_SERVER['REQUEST_METHOD'] == 'POST') {
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $username = trim($_POST['username']);
     $password = trim($_POST['password']);
-    
-    if(empty($username) || empty($password)) {
+
+    if (empty($username) || empty($password)) {
         $error = 'Please fill in all fields';
     } else {
         $query = "SELECT id, username, password FROM users WHERE username = ?";
@@ -19,10 +19,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
         $stmt->bind_param("s", $username);
         $stmt->execute();
         $result = $stmt->get_result();
-        
-        if($result->num_rows == 1) {
+
+        if ($result->num_rows == 1) {
             $user = $result->fetch_assoc();
-            if(password_verify($password, $user['password'])) {
+            if (password_verify($password, $user['password'])) {
                 $_SESSION['user_id'] = $user['id'];
                 $_SESSION['username'] = $user['username'];
                 header("Location: index.php");
@@ -42,7 +42,7 @@ require_once 'includes/header.php';
 <div class="auth-container">
     <h2>Login</h2>
     
-    <?php if(!empty($error)): ?>
+    <?php if (!empty($error)) : ?>
         <div class="alert alert-danger"><?php echo $error; ?></div>
     <?php endif; ?>
     

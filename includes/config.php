@@ -1,4 +1,5 @@
 <?php
+
 // Enhanced error reporting
 error_reporting(E_ALL);
 ini_set('display_errors', 0);
@@ -19,7 +20,7 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Database configuration 
+// Database configuration
 // define('DB_HOST', 'sql106.inflinityfree.com');
 // define('DB_USER', 'if0_39557605');
 // define('DB_PASS', 'rVCFt0dpxofgY3');
@@ -34,14 +35,13 @@ define('DB_NAME', 'visualshare');
 // Create connection with error handling
 try {
     $conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
-    
+
     if ($conn->connect_error) {
         throw new Exception("Database connection failed: " . $conn->connect_error);
     }
-    
+
     // Set charset
     $conn->set_charset("utf8mb4");
-    
 } catch (Exception $e) {
     error_log($e->getMessage());
     die("System maintenance in progress. Please try again later.");
@@ -62,9 +62,8 @@ define('ROOT_DIR', dirname(__DIR__));
 define('UPLOAD_DIR', str_replace('\\', '/', __DIR__ . '/uploads/'));
 define('MAX_FILE_SIZE', 20 * 1024 * 1024); // 20MB
 define('ALLOWED_TYPES', [
-    'image/jpeg', 
-    'image/png', 
-    'image/gif', 
+    'image/jpeg',
+    'image/png',
+    'image/gif',
     'image/webp'
 ]);
-?>

@@ -1,7 +1,7 @@
 <?php
 require_once 'includes/config.php';
 
-if(!isset($_SESSION['user_id'])) {
+if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit;
 }
@@ -19,47 +19,49 @@ $result = $stmt->get_result();
 $user = $result->fetch_assoc();
 
 
-if($_SERVER['REQUEST_METHOD'] == 'POST') {
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $new_username = trim($_POST['username'] ?? '');
-    
+
     // Validate username
-    if(empty($new_username)) {
+    if (empty($new_username)) {
         $error = 'Username cannot be empty';
-    } elseif($new_username != $user['username']) {
+    } elseif ($new_username != $user['username']) {
         // Check if username already exists
         $check_query = "SELECT id FROM users WHERE username = ? AND id != ?";
         $check_stmt = $conn->prepare($check_query);
         $check_stmt->bind_param("si", $new_username, $user_id);
         $check_stmt->execute();
-        
-        if($check_stmt->get_result()->num_rows > 0) {
+
+        if ($check_stmt->get_result()->num_rows > 0) {
             $error = 'Username already taken';
         }
     }
 
-    if(empty($error)) {
+    if (empty($error)) {
         // Handle profile picture upload
         $filepath = null;
-        if(isset($_FILES['profile_pic']) && $_FILES['profile_pic']['error'] == UPLOAD_ERR_OK) {
+        if (isset($_FILES['profile_pic']) && $_FILES['profile_pic']['error'] == UPLOAD_ERR_OK) {
             $file = $_FILES['profile_pic'];
             $file_ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
             $allowed_exts = ['jpg', 'jpeg', 'png', 'gif'];
-            
-            if(in_array($file_ext, $allowed_exts)) {
+
+            if (in_array($file_ext, $allowed_exts)) {
                 $filename = 'profile_' . $user_id . '_' . time() . '.' . $file_ext;
                 $upload_dir = 'assets/profile_pics/';
                 $filepath = $upload_dir . $filename;
-                
+
                 // Create directory if it doesn't exist
                 if (!file_exists($upload_dir)) {
                     mkdir($upload_dir, 0777, true);
                 }
 
-                if(move_uploaded_file($file['tmp_name'], $filepath)) {
+                if (move_uploaded_file($file['tmp_name'], $filepath)) {
                     // Delete old profile picture if it exists and is not the default
-                    if(!empty($user['profile_pic']) && 
-                       $user['profile_pic'] != 'assets/default_profile.jpg' && 
-                       file_exists($user['profile_pic'])) {
+                    if (
+                        !empty($user['profile_pic']) &&
+                        $user['profile_pic'] != 'assets/default_profile.jpg' &&
+                        file_exists($user['profile_pic'])
+                    ) {
                         unlink($user['profile_pic']);
                     }
                 } else {
@@ -70,9 +72,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
             }
         }
 
-        if(empty($error)) {
+        if (empty($error)) {
             // Update database
-            if($filepath) {
+            if ($filepath) {
                 // Update both username and profile pic
                 $update_query = "UPDATE users SET username = ?, profile_pic = ? WHERE id = ?";
                 $update_stmt = $conn->prepare($update_query);
@@ -83,9 +85,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $update_stmt = $conn->prepare($update_query);
                 $update_stmt->bind_param("si", $new_username, $user_id);
             }
-            
-            if($update_stmt->execute()) {
-                if($filepath) {
+
+            if ($update_stmt->execute()) {
+                if ($filepath) {
                     $_SESSION['profile_pic'] = $filepath;
                 }
                 $_SESSION['username'] = $new_username;
@@ -96,7 +98,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
             } else {
                 $error = 'Failed to update profile in database';
                 // Clean up file if DB update failed
-                if($filepath && file_exists($filepath)) {
+                if ($filepath && file_exists($filepath)) {
                     unlink($filepath);
                 }
             }
@@ -395,19 +397,19 @@ require_once 'includes/header.php';
 <div class="edit-profile-container main-container">
     <h1><i class="fas fa-user-edit"></i> Edit Profile</h1>
     
-    <?php if(!empty($error)): ?>
+    <?php if (!empty($error)) : ?>
         <div class="alert alert-danger"><?php echo $error; ?></div>
     <?php endif; ?>
     
-    <?php if(!empty($success)): ?>
+    <?php if (!empty($success)) : ?>
         <div class="alert alert-success"><?php echo $success; ?></div>
     <?php endif; ?>
     
     <div class="profile-preview">
         <div class="profile-avatar" id="profile-avatar">
-            <?php if(!empty($user['profile_pic'])): ?>
+            <?php if (!empty($user['profile_pic'])) : ?>
                 <img id="profile-preview-img" src="<?php echo htmlspecialchars($user['profile_pic']); ?>" alt="Profile Picture">
-            <?php else: ?>
+            <?php else : ?>
                 <div class="default-avatar" id="default-avatar">
                     <i class="fas fa-user"></i>
                 </div>
@@ -495,9 +497,9 @@ document.getElementById('profile_pic').addEventListener('change', function(e) {
     } else {
         fileName.style.display = 'none';
         // Reset to original
-        <?php if(!empty($user['profile_pic'])): ?>
+        <?php if (!empty($user['profile_pic'])) : ?>
             avatarDiv.innerHTML = '<img id="profile-preview-img" src="<?php echo htmlspecialchars($user['profile_pic']); ?>" alt="Profile Picture">';
-        <?php else: ?>
+        <?php else : ?>
             avatarDiv.innerHTML = '<div class="default-avatar" id="default-avatar"><i class="fas fa-user"></i></div>';
         <?php endif; ?>
     }

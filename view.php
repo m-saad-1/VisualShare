@@ -1281,16 +1281,16 @@ body.modal-open {
 </div>
 
 <div class="content-view-container" style="opacity: 0;">
-    <?php if(file_exists($absolute_path)): ?>
+    <?php if (file_exists($absolute_path)) : ?>
         <div class="content-wrapper">
-            <?php if($is_video): ?>
+            <?php if ($is_video) : ?>
                 <div class="video-container">
                     <video controls autoplay>
                         <source src="<?php echo $display_path; ?>" type="video/<?php echo $file_ext; ?>">
                         Your browser does not support the video tag.
                     </video>
                 </div>
-            <?php else: ?>
+            <?php else : ?>
                 <div class="image-container">
                     <div class="skeleton-loader"></div>
                     <img src="<?php echo $display_path; ?>" 
@@ -1302,7 +1302,7 @@ body.modal-open {
                 </div>
             <?php endif; ?>
         </div>
-    <?php else: ?>
+    <?php else : ?>
         <div class="content-missing">
             <i class="fas fa-exclamation-triangle"></i>
             <p>The requested content could not be found</p>
@@ -1312,13 +1312,13 @@ body.modal-open {
     <div class="content-info">
         <h2><?php echo htmlspecialchars($upload['title']); ?></h2>
         
-        <?php if(!empty($upload['description'])): ?>
+        <?php if (!empty($upload['description'])) : ?>
             <p class="description"><?php echo htmlspecialchars($upload['description']); ?></p>
         <?php endif; ?>
         
-        <?php if(!empty($tags)): ?>
+        <?php if (!empty($tags)) : ?>
             <div class="tags-container">
-                <?php foreach($tags as $tag): ?>
+                <?php foreach ($tags as $tag) : ?>
                     <a href="index.php?search=<?php echo urlencode($tag); ?>" class="tag">
                         #<?php echo htmlspecialchars($tag); ?>
                     </a>
@@ -1327,16 +1327,16 @@ body.modal-open {
         <?php endif; ?>
         
         <div class="user-info-container">
-            <a href="<?php echo ($current_user_id == $upload['user_id']) ? 'dashboard.php' : 'profile.php?id='.$upload['user_id']; ?>" 
+            <a href="<?php echo ($current_user_id == $upload['user_id']) ? 'dashboard.php' : 'profile.php?id=' . $upload['user_id']; ?>" 
                class="profile-link">
                 <div class="user-avatar">
-                    <?php if(!empty($upload['profile_pic'])): ?>
+                    <?php if (!empty($upload['profile_pic'])) : ?>
                         <img src="<?php echo BASE_URL . '/' . htmlspecialchars($upload['profile_pic']); ?>" 
                              alt="<?php echo htmlspecialchars($upload['username']); ?>'s profile picture"
                              class="user-profile-pic"
                              loading="lazy"
                              decoding="async">
-                    <?php else: ?>
+                    <?php else : ?>
                         <div class="user-avatar-initials">
                             <?php echo $initials; ?>
                         </div>
@@ -1349,7 +1349,7 @@ body.modal-open {
             </a>
             
             <div class="action-buttons">
-                <?php if($current_user_id != $upload['user_id']): ?>
+                <?php if ($current_user_id != $upload['user_id']) : ?>
                     <button class="btn btn-follow <?php echo $is_following ? 'btn-following' : ''; ?>"
                             id="followButton"
                             data-user-id="<?php echo $upload['user_id']; ?>">
@@ -1367,7 +1367,7 @@ body.modal-open {
                     <i class="fas fa-share-alt"></i>
                 </button>
 
-                <?php if(!$is_video): ?>
+                <?php if (!$is_video) : ?>
                 <a href="<?php echo $display_path; ?>" download class="btn" id="downloadButton" title="Download">
                     <i class="fas fa-download"></i>
                 </a>
@@ -1383,7 +1383,7 @@ body.modal-open {
             <div class="comments-section">
                 <h3><i class="fas fa-comments"></i> Comments</h3>
 
-                <?php if ($current_user_id > 0): ?>
+                <?php if ($current_user_id > 0) : ?>
                     <div class="comment-form">
                         <form id="commentForm">
                             <div class="form-group">
@@ -1395,7 +1395,7 @@ body.modal-open {
                             </div>
                         </form>
                     </div>
-                <?php else: ?>
+                <?php else : ?>
                     <div class="comment-login-prompt">
                         <p><a href="login.php?return=<?php echo urlencode($_SERVER['REQUEST_URI']); ?>">Sign in</a> or <a href="register.php">sign up</a> to leave a comment.</p>
                     </div>
@@ -1406,13 +1406,13 @@ body.modal-open {
                 </div>
             </div>
 
-        <?php if(!empty($related_uploads)): ?>
+        <?php if (!empty($related_uploads)) : ?>
             <div class="related-section">
                 <h3>More from <?php echo htmlspecialchars($upload['username']); ?></h3>
                 <div class="related-grid">
-                    <?php foreach($related_uploads as $related):
+                    <?php foreach ($related_uploads as $related) :
                         $related_path = str_replace($_SERVER['DOCUMENT_ROOT'], '', $related['filepath']);
-                    ?>
+                        ?>
                         <div class="related-item">
                             <a href="view.php?id=<?php echo $related['id']; ?>">
                                 <div class="image-skeleton"></div>

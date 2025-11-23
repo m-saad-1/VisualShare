@@ -201,7 +201,7 @@ try {
         array_push($params, $items_per_page, $offset);
         $types .= 'ii';
 
-        
+
         $stmt = $conn->prepare($query);
         if ($stmt) {
             $stmt->bind_param($types, ...$params);
@@ -289,9 +289,10 @@ try {
 <div class="container" style="opacity: 0; transition: opacity 0.5s ease-in-out;" tabindex="-1">
     <h1>Latest Visual Content</h1>
 
-    <?php if(isset($_SESSION['success'])): ?>
+    <?php if (isset($_SESSION['success'])) : ?>
         <div class="alert alert-success">
-            <?php echo $_SESSION['success']; unset($_SESSION['success']); ?>
+            <?php echo $_SESSION['success'];
+            unset($_SESSION['success']); ?>
         </div>
     <?php endif; ?>
 
@@ -308,7 +309,7 @@ try {
                        autocomplete="off"
                        spellcheck="false"
                        />
-                <?php if(!empty($search_query)): ?>
+                <?php if (!empty($search_query)) : ?>
                     <button type="button" class="clear-search" aria-label="Clear search">
                         <i class="fas fa-times" aria-hidden="true"></i>
                     </button>
@@ -328,8 +329,8 @@ try {
     </div>
 
     <div class="masonry-grid" id="masonryGrid" aria-live="polite" aria-relevant="additions">
-        <?php if(count($items) > 0): ?>
-            <?php foreach ($items as $row): ?>
+        <?php if (count($items) > 0) : ?>
+            <?php foreach ($items as $row) : ?>
                 <?php
                 $file_ext = strtolower(pathinfo($row['filename'], PATHINFO_EXTENSION));
                 $is_video = in_array($file_ext, ['mp4', 'mov', 'avi', 'wmv', 'webm']);
@@ -353,10 +354,10 @@ try {
 
                 // Generate initials for avatar fallback
                 $initials = '';
-                if(!empty($row['username'])) {
+                if (!empty($row['username'])) {
                     $names = explode(' ', $row['username']);
                     $initials = strtoupper(substr($names[0], 0, 1));
-                    if(count($names) > 1) {
+                    if (count($names) > 1) {
                         $initials .= strtoupper(substr(end($names), 0, 1));
                     }
                 }
@@ -366,11 +367,11 @@ try {
                 ?>
                 <div class="masonry-item" data-upload-id="<?php echo $row['id']; ?>">
                     <a href="view.php?id=<?php echo $row['id']; ?>" class="masonry-content" tabindex="0">
-                        <?php if(file_exists($absolute_path)): ?>
-                            <?php if($is_video): ?>
+                        <?php if (file_exists($absolute_path)) : ?>
+                            <?php if ($is_video) : ?>
                                 <div class="video-thumbnail-container">
                                     <div class="image-skeleton"></div>
-                                    <?php if(!empty($thumbnail_to_show)): 
+                                    <?php if (!empty($thumbnail_to_show)) :
                                         $thumbnail_width = 640; // Default
                                         $thumbnail_height = 360; // Default
                                         if (!empty($thumbnail_to_show) && file_exists($absolute_thumbnail_path)) {
@@ -379,21 +380,21 @@ try {
                                                 $thumbnail_width = $thumb_size[0];
                                                 $thumbnail_height = $thumb_size[1];
                                             }
-                                        } else if ($is_video) {
-                                            $thumbnail_width = 640; 
+                                        } elseif ($is_video) {
+                                            $thumbnail_width = 640;
                                             $thumbnail_height = 360;
                                         }
-                                    ?>
+                                        ?>
                                         <img src="<?php echo $thumbnail_to_show; ?>?quality=70"
                                              alt="Thumbnail for <?php echo htmlspecialchars($row['title']); ?>"
                                              loading="lazy"
                                              decoding="async"
-                                             <?php if ($thumbnail_width && $thumbnail_height): ?>
+                                             <?php if ($thumbnail_width && $thumbnail_height) : ?>
                                              width="<?php echo $thumbnail_width; ?>"
                                              height="<?php echo $thumbnail_height; ?>"
                                              <?php endif; ?>
                                              onload="this.classList.add('loaded'); this.previousElementSibling.style.opacity='0';">
-                                    <?php else: ?>
+                                    <?php else : ?>
                                         <video width="100%" preload="metadata" muted 
                                                onloadeddata="this.classList.add('loaded'); this.previousElementSibling.style.display='none';"
                                                playsinline>
@@ -405,7 +406,7 @@ try {
                                         <i class="fas fa-play" aria-hidden="true"></i>
                                     </div>
                                 </div>
-                            <?php else: ?>
+                            <?php else : ?>
                                 <?php
                                 // Calculate aspect ratio to prevent layout shift
                                 $aspect_ratio_style = 'padding-top: 100%;';
@@ -422,14 +423,14 @@ try {
                                          alt="<?php echo htmlspecialchars($row['title']); ?>"
                                          loading="lazy"
                                          decoding="async"
-                                         <?php if ($image_size && $image_size[0] > 0 && $image_size[1] > 0): ?>
+                                         <?php if ($image_size && $image_size[0] > 0 && $image_size[1] > 0) : ?>
                                          width="<?php echo $image_size[0]; ?>"
                                          height="<?php echo $image_size[1]; ?>"
                                          <?php endif; ?>
                                          onload="this.classList.add('loaded'); this.previousElementSibling.style.opacity = '0';">
                                 </div>
                             <?php endif; ?>
-                        <?php else: ?>
+                        <?php else : ?>
                             <div class="image-placeholder" role="img" aria-label="Content not found">
                                 <i class="fas fa-image" aria-hidden="true"></i>
                                 <p>Content not found</p>
@@ -442,14 +443,14 @@ try {
                             <div class="masonry-footer">
                                 <div class="user-info">
                                     <div class="user-avatar" aria-label="User avatar">
-                                        <?php if(!empty($row['profile_pic'])): ?>
+                                        <?php if (!empty($row['profile_pic'])) : ?>
                                             <img src="<?php echo BASE_URL . '/' . htmlspecialchars($row['profile_pic']); ?>" 
                                                  alt="<?php echo htmlspecialchars($row['username']); ?>'s profile picture"
                                                  class="user-profile-pic"
                                                  loading="lazy"
                                                  decoding="async"
                                                  onload="this.classList.add('loaded');">
-                                        <?php else: ?>
+                                        <?php else : ?>
                                             <div class="user-avatar-initials" aria-hidden="true">
                                                 <?php echo $initials; ?>
                                             </div>
@@ -476,7 +477,7 @@ try {
                     </a>
                 </div>
             <?php endforeach; ?>
-        <?php else: ?>
+        <?php else : ?>
             <p class="no-content">No content found. Try adjusting your search or <a href="upload.php">upload something</a>!</p>
         <?php endif; ?>
     </div>

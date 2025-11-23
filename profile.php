@@ -1,7 +1,7 @@
 <?php
 require_once 'includes/config.php';
 
-if(!isset($_GET['id'])) {
+if (!isset($_GET['id'])) {
     header("Location: index.php");
     exit;
 }
@@ -10,17 +10,17 @@ $profile_id = intval($_GET['id']);
 $current_user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 0;
 
 // Get user information (without email for other users)
-$select_fields = $current_user_id == $profile_id ? 
-    "username, email, created_at, gender, profile_pic" : 
+$select_fields = $current_user_id == $profile_id ?
+    "username, email, created_at, gender, profile_pic" :
     "username, created_at, gender, profile_pic";
-    
+
 $user_query = "SELECT $select_fields FROM users WHERE id = ?";
 $user_stmt = $conn->prepare($user_query);
 $user_stmt->bind_param("i", $profile_id);
 $user_stmt->execute();
 $user_result = $user_stmt->get_result();
 
-if($user_result->num_rows == 0) {
+if ($user_result->num_rows == 0) {
     header("Location: index.php");
     exit;
 }
@@ -30,7 +30,7 @@ $user = $user_result->fetch_assoc();
 
 // Check if current user is following this profile
 $is_following = false;
-if($current_user_id > 0) {
+if ($current_user_id > 0) {
     $follow_query = "SELECT 1 FROM user_follows WHERE follower_id = ? AND following_id = ?";
     $follow_stmt = $conn->prepare($follow_query);
     $follow_stmt->bind_param("ii", $current_user_id, $profile_id);
@@ -47,7 +47,7 @@ $count_stmt = $conn->prepare("SELECT
 $count_stmt->bind_param("ii", $profile_id, $profile_id);
 $count_stmt->execute();
 $count_result = $count_stmt->get_result()->fetch_assoc();
-if($count_result) {
+if ($count_result) {
     $follower_count = $count_result['followers'];
     $following_count = $count_result['following'];
 }
@@ -69,10 +69,10 @@ $uploads = $uploads_stmt->get_result();
 
 // Generate initials for avatar
 $initials = '';
-if(!empty($user['username'])) {
+if (!empty($user['username'])) {
     $names = explode(' ', $user['username']);
     $initials = strtoupper(substr($names[0], 0, 1));
-    if(count($names) > 1) {
+    if (count($names) > 1) {
         $initials .= strtoupper(substr(end($names), 0, 1));
     }
 }
@@ -735,10 +735,10 @@ require_once 'includes/header.php';
     <section class="profile-section">
         <div class="profile-header">
             <div class="profile-avatar">
-                <?php if(!empty($user['profile_pic'])): ?>
+                <?php if (!empty($user['profile_pic'])) : ?>
                     <img src="<?php echo htmlspecialchars($user['profile_pic']); ?>" 
                          alt="Profile Picture" class="avatar-img">
-                <?php else: ?>
+                <?php else : ?>
                     <div class="avatar-with-initials <?php echo 'avatar-' . ($user['gender'] ?? 'other'); ?>">
                         <?php echo $initials; ?>
                     </div>
@@ -749,7 +749,7 @@ require_once 'includes/header.php';
                     <p class="profile-join-date">Member since <?php echo date('F Y', strtotime($user['created_at'])); ?></p>
                 </div>
             </div>
-            <?php if($current_user_id > 0 && $current_user_id != $profile_id): ?>
+            <?php if ($current_user_id > 0 && $current_user_id != $profile_id) : ?>
                 <div class="profile-actions">
                     <button class="btn <?php echo $is_following ? 'btn-following' : 'btn-follow'; ?>" 
                             id="followButton" 
@@ -783,19 +783,19 @@ require_once 'includes/header.php';
             <h2><i class="fas fa-photo-video"></i> <?php echo htmlspecialchars($user['username']); ?>'s Content</h2>
         </div>
 
-        <?php if($uploads->num_rows > 0): ?>
+        <?php if ($uploads->num_rows > 0) : ?>
             <div class="content-grid">
-                <?php while($upload = $uploads->fetch_assoc()): 
+                <?php while ($upload = $uploads->fetch_assoc()) :
                     $is_video = preg_match('/\.(mp4|mov|avi|webm)$/i', $upload['filename']);
                     $display_path = str_replace($_SERVER['DOCUMENT_ROOT'], '', $upload['filepath']);
                     $thumbnail_path = str_replace($_SERVER['DOCUMENT_ROOT'], '', $upload['display_image']);
-                ?>
+                    ?>
                     <div class="content-card" data-id="<?php echo $upload['id']; ?>">
                         <div class="card-media" onclick="window.location.href='view.php?id=<?php echo $upload['id']; ?>'">
-                            <?php if($is_video): ?>
-                                <?php if(file_exists($_SERVER['DOCUMENT_ROOT'] . $thumbnail_path)): ?>
+                            <?php if ($is_video) : ?>
+                                <?php if (file_exists($_SERVER['DOCUMENT_ROOT'] . $thumbnail_path)) : ?>
                                     <img src="<?php echo $thumbnail_path; ?>" alt="Video thumbnail">
-                                <?php else: ?>
+                                <?php else : ?>
                                     <div class="video-thumbnail-fallback">
                                         <i class="fas fa-play"></i>
                                     </div>
@@ -803,7 +803,7 @@ require_once 'includes/header.php';
                                 <div class="video-badge">
                                     <i class="fas fa-play"></i>
                                 </div>
-                            <?php else: ?>
+                            <?php else : ?>
                                 <img src="<?php echo $display_path; ?>" alt="<?php echo htmlspecialchars($upload['title']); ?>">
                             <?php endif; ?>
                             <div class="card-hover-actions">
@@ -825,7 +825,7 @@ require_once 'includes/header.php';
                     </div>
                 <?php endwhile; ?>
             </div>
-        <?php else: ?>
+        <?php else : ?>
             <div class="empty-state">
                 <div class="empty-icon">
                     <i class="fas fa-cloud-upload-alt"></i>

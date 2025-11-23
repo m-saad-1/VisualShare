@@ -1,4 +1,5 @@
 <?php
+
 require_once 'config.php';
 
 header('Content-Type: application/json');
@@ -53,24 +54,24 @@ try {
         $check = $conn->prepare("SELECT 1 FROM user_favorites WHERE user_id = ? AND upload_id = ?");
         $check->bind_param("ii", $userId, $contentId);
         $check->execute();
-        
+
         if ($check->get_result()->num_rows > 0) {
             echo json_encode(['success' => true, 'message' => 'Already favorited']);
             exit;
         }
-        
+
         // Add to favorites
         $stmt = $conn->prepare("INSERT INTO user_favorites (user_id, upload_id) VALUES (?, ?)");
         $stmt->bind_param("ii", $userId, $contentId);
         $stmt->execute();
-        
+
         echo json_encode(['success' => true, 'message' => 'Added to favorites']);
     } else {
         // Remove from favorites
         $stmt = $conn->prepare("DELETE FROM user_favorites WHERE user_id = ? AND upload_id = ?");
         $stmt->bind_param("ii", $userId, $contentId);
         $stmt->execute();
-        
+
         echo json_encode(['success' => true, 'message' => 'Removed from saved items!']);
     }
 } catch (Exception $e) {

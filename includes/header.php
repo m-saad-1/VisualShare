@@ -219,21 +219,20 @@ if ($user_id) {
                 </div>
             </div>
             <div class="header-right">
-                <?php if(isset($_SESSION['user_id'])): ?>
-               
+                <?php if (isset($_SESSION['user_id'])) : ?>
                     <div class="profile-pic-container">
                         <a href="dashboard.php" class="profile-pic-link" title="Dashboard" >
-                            <?php if(!empty($user_data['profile_pic'])): ?>
+                            <?php if (!empty($user_data['profile_pic'])) : ?>
                                 <img src="<?php echo htmlspecialchars($user_data['profile_pic']); ?>" 
                                      alt="Profile Picture" class="header-profile-pic">
-                            <?php else: ?>
+                            <?php else : ?>
                                 <div class="header-avatar-initials">
                                     <?php echo $initials; ?>
                                 </div>
                             <?php endif; ?>
                         </a>
                     </div>
-                <?php else: ?>
+                <?php else : ?>
                     <a href="login.php" class="nav-link" title="Login">
                         <i class="fas fa-sign-in-alt"></i>
                     </a>

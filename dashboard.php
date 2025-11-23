@@ -2,7 +2,7 @@
 
 require_once 'includes/config.php';
 
-if(!isset($_SESSION['user_id'])) {
+if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit;
 }
@@ -18,10 +18,10 @@ $user = $result->fetch_assoc();
 
 // Generate initials for avatar fallback
 $initials = '';
-if(!empty($user['username'])) {
+if (!empty($user['username'])) {
     $names = explode(' ', $user['username']);
     $initials = strtoupper(substr($names[0], 0, 1));
-    if(count($names) > 1) {
+    if (count($names) > 1) {
         $initials .= strtoupper(substr(end($names), 0, 1));
     }
 }
@@ -35,7 +35,7 @@ $count_stmt = $conn->prepare("SELECT
 $count_stmt->bind_param("ii", $user_id, $user_id);
 $count_stmt->execute();
 $count_result = $count_stmt->get_result()->fetch_assoc();
-if($count_result) {
+if ($count_result) {
     $follower_count = $count_result['followers'];
     $following_count = $count_result['following'];
 }
@@ -73,7 +73,7 @@ if ($is_ajax_request && isset($_GET['ajax_content'])) {
     $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
     $per_page = 12;
     $offset = ($page - 1) * $per_page;
-    
+
     if ($content_type === 'saved') {
         // Query for saved content
         $uploads_query = "SELECT u.*, 
@@ -108,14 +108,14 @@ if ($is_ajax_request && isset($_GET['ajax_content'])) {
                         WHERE u.user_id = ?";
     }
 
-    if(!empty($search)) {
+    if (!empty($search)) {
         $uploads_query .= " AND (u.title LIKE ? OR u.description LIKE ?)";
     }
 
-    if(!empty($type_filter)) {
-        if($type_filter === 'image') {
+    if (!empty($type_filter)) {
+        if ($type_filter === 'image') {
             $uploads_query .= " AND u.filename REGEXP '\\.(jpg|jpeg|png|gif|webp)$'";
-        } elseif($type_filter === 'video') {
+        } elseif ($type_filter === 'video') {
             $uploads_query .= " AND u.filename REGEXP '\\.(mp4|mov|avi|webm)$'";
         }
     }
@@ -123,7 +123,7 @@ if ($is_ajax_request && isset($_GET['ajax_content'])) {
     $uploads_query .= " GROUP BY u.id";
 
     // Add sorting
-    if($sort === 'oldest') {
+    if ($sort === 'oldest') {
         $uploads_query .= " ORDER BY u.upload_date ASC";
     } else {
         $uploads_query .= " ORDER BY u.upload_date DESC";
@@ -139,12 +139,12 @@ if ($is_ajax_request && isset($_GET['ajax_content'])) {
         $count_query = "SELECT COUNT(*) as total FROM uploads WHERE user_id = ?";
     }
 
-    if(!empty($search)) {
+    if (!empty($search)) {
         $count_query .= " AND (title LIKE ? OR description LIKE ?)";
     }
 
     $count_stmt = $conn->prepare($count_query);
-    if(!empty($search)) {
+    if (!empty($search)) {
         $search_param = "%$search%";
         if ($content_type === 'saved') {
             $count_stmt->bind_param("iss", $user_id, $search_param, $search_param);
@@ -168,37 +168,41 @@ if ($is_ajax_request && isset($_GET['ajax_content'])) {
     }
 
     if ($content_type === 'saved') {
-        if(!empty($search)) {
+        if (!empty($search)) {
             $search_param = "%$search%";
-            $uploads_stmt->bind_param("issii", 
-                $user_id,  
+            $uploads_stmt->bind_param(
+                "issii",
+                $user_id,
                 $search_param,
                 $search_param,
                 $per_page,
                 $offset
             );
         } else {
-            $uploads_stmt->bind_param("iii", 
-                $user_id,  
+            $uploads_stmt->bind_param(
+                "iii",
+                $user_id,
                 $per_page,
                 $offset
             );
         }
     } else {
-        if(!empty($search)) {
+        if (!empty($search)) {
             $search_param = "%$search%";
-            $uploads_stmt->bind_param("iissii", 
-                $user_id,  
-                $user_id,  
+            $uploads_stmt->bind_param(
+                "iissii",
+                $user_id,
+                $user_id,
                 $search_param,
                 $search_param,
                 $per_page,
                 $offset
             );
         } else {
-            $uploads_stmt->bind_param("iiii", 
-                $user_id,  
-                $user_id,  
+            $uploads_stmt->bind_param(
+                "iiii",
+                $user_id,
+                $user_id,
                 $per_page,
                 $offset
             );
@@ -209,13 +213,13 @@ if ($is_ajax_request && isset($_GET['ajax_content'])) {
         die(json_encode(['error' => "Error executing statement: " . $uploads_stmt->error]));
     }
     $uploads = $uploads_stmt->get_result();
-    
+
     // Prepare data for AJAX response
     $content_data = [];
-    while($upload = $uploads->fetch_assoc()) {
+    while ($upload = $uploads->fetch_assoc()) {
         $content_data[] = $upload;
     }
-    
+
     // Return JSON response
     header('Content-Type: application/json');
     echo json_encode([
@@ -235,34 +239,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bulk_action'])) {
     if (isset($_POST['selected_items']) && !empty($_POST['selected_items'])) {
         // Decode the JSON string to get the array of IDs
         $selected_ids = json_decode($_POST['selected_items'], true);
-        
+
         if (is_array($selected_ids) && !empty($selected_ids)) {
             // Verify ownership and delete each item
             $deleted_count = 0;
             foreach ($selected_ids as $id) {
                 $id = intval($id);
-                
+
                 // Check ownership first
                 $check_stmt = $conn->prepare("SELECT user_id, filepath, thumbnail_path FROM uploads WHERE id = ?");
                 $check_stmt->bind_param("i", $id);
                 $check_stmt->execute();
                 $result = $check_stmt->get_result();
-                
+
                 if ($result->num_rows > 0) {
                     $content = $result->fetch_assoc();
-                    
+
                     // Verify ownership
                     if ($content['user_id'] == $user_id) {
                         // Delete files from server - fix file paths
                         $base_path = $_SERVER['DOCUMENT_ROOT'];
-                        
+
                         if (!empty($content['filepath']) && file_exists($base_path . $content['filepath'])) {
                             unlink($base_path . $content['filepath']);
                         }
                         if (!empty($content['thumbnail_path']) && file_exists($base_path . $content['thumbnail_path'])) {
                             unlink($base_path . $content['thumbnail_path']);
                         }
-                        
+
                         // Delete from database
                         $delete_stmt = $conn->prepare("DELETE FROM uploads WHERE id = ?");
                         $delete_stmt->bind_param("i", $id);
@@ -272,7 +276,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bulk_action'])) {
                     }
                 }
             }
-            
+
             // Set success message
             $_SESSION['success_message'] = "Successfully deleted $deleted_count items.";
         } else {
@@ -281,7 +285,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bulk_action'])) {
     } else {
         $_SESSION['error_message'] = "No items selected for deletion.";
     }
-    
+
     // Redirect back to dashboard
     header("Location: dashboard.php");
     exit;
@@ -1802,10 +1806,10 @@ body {
                 
                 <div class="profile-header">
                     <div class="profile-avatar">
-                        <?php if(!empty($user['profile_pic'])): ?>
+                        <?php if (!empty($user['profile_pic'])) : ?>
                             <img src="<?php echo htmlspecialchars($user['profile_pic']); ?>" 
                                  alt="Profile Picture" class="avatar-img">
-                        <?php else: ?>
+                        <?php else : ?>
                             <div class="avatar-with-initials <?php echo 'avatar-' . ($user['gender'] ?? 'other'); ?>">
                                 <?php echo $initials; ?>
                             </div>
@@ -1818,7 +1822,7 @@ body {
                     </div>
                 </div>
 
-                <?php if(!empty($user['bio'])): ?>
+                <?php if (!empty($user['bio'])) : ?>
                     <div class="profile-bio">
                         <?php echo nl2br(htmlspecialchars($user['bio'])); ?>
                     </div>
@@ -1910,21 +1914,21 @@ body {
             <section class="sidebar-section">
                 <h3 class="sidebar-title"><i class="fas fa-bell"></i> Recent Activity</h3>
                 <div class="activity-list">
-                    <?php if($recent_activity->num_rows > 0): ?>
-                        <?php while($activity = $recent_activity->fetch_assoc()): ?>
+                    <?php if ($recent_activity->num_rows > 0) : ?>
+                        <?php while ($activity = $recent_activity->fetch_assoc()) : ?>
                             <div class="activity-item">
                                 <div class="activity-icon">
-                                    <?php if($activity['type'] === 'upload'): ?>
+                                    <?php if ($activity['type'] === 'upload') : ?>
                                         <i class="fas fa-upload"></i>
-                                    <?php else: ?>
+                                    <?php else : ?>
                                         <i class="fas fa-user-plus"></i>
                                     <?php endif; ?>
                                 </div>
                                 <div class="activity-content">
                                     <div class="activity-text">
-                                        <?php if($activity['type'] === 'upload'): ?>
+                                        <?php if ($activity['type'] === 'upload') : ?>
                                             You uploaded "<?php echo htmlspecialchars($activity['title']); ?>"
-                                        <?php else: ?>
+                                        <?php else : ?>
                                             <?php echo htmlspecialchars($activity['follower_name']); ?> started following you
                                         <?php endif; ?>
                                     </div>
@@ -1934,7 +1938,7 @@ body {
                                 </div>
                             </div>
                         <?php endwhile; ?>
-                    <?php else: ?>
+                    <?php else : ?>
                         <p class="no-follows">No recent activity</p>
                     <?php endif; ?>
                 </div>
@@ -2112,14 +2116,14 @@ let currentModalUserId = 0;
 let unsaveButtonRef = null;
 
 document.addEventListener('DOMContentLoaded', function() {
-    <?php if (isset($_SESSION['success_message'])): ?>
+    <?php if (isset($_SESSION['success_message'])) : ?>
     showAlert('<?php echo addslashes($_SESSION['success_message']); ?>', 'success');
-    <?php unset($_SESSION['success_message']); ?>
+        <?php unset($_SESSION['success_message']); ?>
     <?php endif; ?>
     
-    <?php if (isset($_SESSION['error_message'])): ?>
+    <?php if (isset($_SESSION['error_message'])) : ?>
     showAlert('<?php echo addslashes($_SESSION['error_message']); ?>', 'error');
-    <?php unset($_SESSION['error_message']); ?>
+        <?php unset($_SESSION['error_message']); ?>
     <?php endif; ?>
     
 

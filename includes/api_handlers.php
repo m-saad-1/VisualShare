@@ -1,15 +1,23 @@
 <?php
+
 // includes/api_handlers.php
 
 // Custom exception classes
-class AuthenticationException extends Exception {}
-class DatabaseException extends Exception {}
-class ValidationException extends Exception {}
+class AuthenticationException extends Exception
+{
+}
+class DatabaseException extends Exception
+{
+}
+class ValidationException extends Exception
+{
+}
 
-function handleCommentsApi($conn, $user_id) {
+function handleCommentsApi($conn, $user_id)
+{
     header('Content-Type: application/json');
 
-    
+
 
     $request_method = $_SERVER['REQUEST_METHOD'];
     $input = [];
@@ -194,7 +202,8 @@ function handleCommentsApi($conn, $user_id) {
     exit;
 }
 
-function handleLikesApi($conn, $user_id) {
+function handleLikesApi($conn, $user_id)
+{
     header('Content-Type: application/json');
 
     $response = [
@@ -245,12 +254,12 @@ function handleLikesApi($conn, $user_id) {
         if (!$stmt) {
             throw new DatabaseException('Database prepare failed');
         }
-        
+
         $stmt->bind_param("i", $upload_id);
         if (!$stmt->execute()) {
             throw new DatabaseException('Database query failed');
         }
-        
+
         if ($stmt->get_result()->num_rows === 0) {
             $response['message'] = 'Content not found';
             http_response_code(404);
@@ -263,7 +272,7 @@ function handleLikesApi($conn, $user_id) {
             $check = $conn->prepare("SELECT id FROM likes WHERE user_id = ? AND upload_id = ?");
             $check->bind_param("ii", $user_id, $upload_id);
             $check->execute();
-            
+
             if ($check->get_result()->num_rows === 0) {
                 $insert = $conn->prepare("INSERT INTO likes (user_id, upload_id) VALUES (?, ?)");
                 if (!$insert || !$insert->bind_param("ii", $user_id, $upload_id) || !$insert->execute()) {
@@ -282,16 +291,15 @@ function handleLikesApi($conn, $user_id) {
         if (!$count_stmt || !$count_stmt->bind_param("i", $upload_id) || !$count_stmt->execute()) {
             throw new DatabaseException('Failed to get like count');
         }
-        
+
         $count_result = $count_stmt->get_result();
         $count = $count_result->fetch_assoc()['cnt'];
-        
+
         $response = [
             'success' => true,
             'like_count' => $count,
             'message' => ucfirst($action) . ' successful'
         ];
-
     } catch (AuthenticationException $e) {
         $response['message'] = 'Authentication error';
         http_response_code(401);
@@ -301,9 +309,8 @@ function handleLikesApi($conn, $user_id) {
     } catch (Exception $e) {
         $response['message'] = 'Server error';
         http_response_code(500);
-    } 
-    
+    }
+
     echo json_encode($response);
     exit;
 }
-?>
