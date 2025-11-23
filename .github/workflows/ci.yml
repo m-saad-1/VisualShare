@@ -16,7 +16,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.1' # Or your target PHP version
+          php-version: '8.2' # Updated to match package requirements
           extensions: mysqli, gd, intl # Add extensions your project needs
           tools: composer, phpcs, phpstan # Install useful tools
 
