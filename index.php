@@ -5,12 +5,11 @@ require_once 'includes/config.php';
 $page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int)$_GET['page'] : 1;
 $items_per_page = 12; // Initial load count
 $offset = ($page - 1) * $items_per_page;
-
-error_reporting(E_ALL);
+	error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 if (
-    ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ajax'])) ||
+    ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ajax'])) || 
     (isset($_GET['ajax']) && $_GET['ajax'] === '1')
 ) {
     header('Content-Type: application/json');
@@ -201,7 +200,10 @@ try {
         array_push($params, $items_per_page, $offset);
         $types .= 'ii';
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 17221d95d261719fb200adfa22987188281345e8
         $stmt = $conn->prepare($query);
         if ($stmt) {
             $stmt->bind_param($types, ...$params);
@@ -248,20 +250,20 @@ try {
     }
 
     // Get total count for pagination logic in JS
-    $count_query = "SELECT COUNT(DISTINCT uploads.id) as total 
-                   FROM uploads 
+    $count_query = "SELECT COUNT(DISTINCT uploads.id) as total \
+                   FROM uploads \
                    JOIN users ON uploads.user_id = users.id";
     if ($tables_exist && !empty($search_query)) {
-        $count_query .= " LEFT JOIN upload_tags ut ON ut.upload_id = uploads.id
-                         LEFT JOIN tags t ON t.id = ut.tag_id
-                         WHERE (uploads.title LIKE ? 
-                         OR uploads.description LIKE ? 
-                         OR users.username LIKE ?
+        $count_query .= " LEFT JOIN upload_tags ut ON ut.upload_id = uploads.id\
+                         LEFT JOIN tags t ON t.id = ut.tag_id\
+                         WHERE (uploads.title LIKE ? \
+                         OR uploads.description LIKE ? \
+                         OR users.username LIKE ?\
                          OR t.name LIKE ?)";
     } elseif (!empty($search_query)) {
-        $count_query .= " WHERE (uploads.title LIKE ? 
-                         OR uploads.description LIKE ? 
-                         OR users.username LIKE ?)";
+        $count_query .= " WHERE (uploads.title LIKE ? \
+                         OR uploads.description LIKE ? \
+                         OR users.username LIKE ?}";
     }
 
     $count_stmt = $conn->prepare($count_query);
@@ -276,6 +278,7 @@ try {
 } catch (Exception $e) {
     die("Database error: " . $e->getMessage());
 }
+
 ?>
 
 <!-- Loading overlay -->
