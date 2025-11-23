@@ -16,16 +16,9 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.2'
-          extensions: mysqli, gd, intl
-          tools: composer, phpcs, phpstan
-
-      - name: Debug: show PHP & Composer versions
-        run: |
-          php -v
-          php -m || true
-          composer --version || true
-          composer diagnose || true
+          php-version: '8.1' # Or your target PHP version
+          extensions: mysqli, gd, intl # Add extensions your project needs
+          tools: composer, phpcs, phpstan # Install useful tools
 
       - name: Validate composer.json and composer.lock
         run: composer validate --strict
@@ -40,7 +33,7 @@ jobs:
             ${{ runner.os }}-php-
 
       - name: Install dependencies
-        run: composer install --prefer-dist --no-interaction --no-progress
+        run: composer install --prefer-dist --no-progress
 
       - name: Check PHP Syntax (Linting)
         run: find . -type f -name "*.php" -not -path "./vendor/*" -exec php -l {} \;
@@ -50,13 +43,16 @@ jobs:
 
       - name: Run Static Analysis (PHPStan)
         run: phpstan analyse --level=1 --memory-limit=2G .
+        # Start with a low level (like 1) and increase it as you fix errors.
 
       - name: Run Unit Tests (PHPUnit)
-        run: ./vendor/bin/phpunit || true
+        run: ./vendor/bin/phpunit
+        # This step is commented out because you don't have tests yet.
 
   deploy:
     needs: build-and-test
     runs-on: ubuntu-latest
+    # Only run this job when code is pushed to the main branch
     if: github.ref == 'refs/heads/main'
     steps:
       - name: Checkout code
@@ -65,11 +61,15 @@ jobs:
       - name: Deploy to Server via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
+          # Use SFTP for a secure connection (port 22 is default for SFTP)
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
+          # Add the port for standard FTP
           port: 21
+          # The directory on your server to deploy to
           remote-path: ${{ secrets.REMOTE_PATH }}
+          # Exclude development files and folders from the upload
           exclude: |
             **/.git*
             **/.git*/**
@@ -80,3 +80,4 @@ jobs:
             phpstan.neon.dist
             .phpcs.xml.dist
             README.md
+        # Once you add a phpunit.xml configuration and tests, you can enable this.
