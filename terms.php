@@ -26,19 +26,24 @@ require_once 'includes/header.php';
         <div class="terms-content">
             <section class="terms-section">
                 <h2>1. Acceptance of Terms</h2>
-                <p>By accessing and using VisualShare ("the Service"), you accept and agree to be bound by the terms and provision of this agreement. If you do not agree to abide by the above, please do not use this service.</p>
+                <p>By accessing and using VisualShare ("the Service"), you accept and agree to be bound by the
+                    terms and provision of this agreement. If you do not agree to abide by the above, please do
+                    not use this service.</p>
             </section>
 
             <section class="terms-section">
                 <h2>2. Description of Service</h2>
-                <p>VisualShare is a platform that allows users to upload, share, and discover visual content including images and videos. We provide tools for content creation, community interaction, and content discovery.</p>
+                <p>VisualShare is a platform that allows users to upload, share, and discover visual content
+                    including images and videos. We provide tools for content creation, community interaction, and
+                    content discovery.</p>
             </section>
 
             <section class="terms-section">
                 <h2>3. User Accounts</h2>
                 <div class="subsection">
                     <h3>3.1 Account Creation</h3>
-                    <p>To use certain features of the Service, you must register for an account. You must provide accurate, complete, and current information during the registration process.</p>
+                    <p>To use certain features of the Service, you must register for an account. You must provide
+                        accurate, complete, and current information during the registration process.</p>
                 </div>
                 <div class="subsection">
                     <h3>3.2 Account Security</h3>
