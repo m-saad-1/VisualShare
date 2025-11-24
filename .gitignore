@@ -1,1 +1,2 @@
-/vendor
+# Composer dependencies
+/vendor/

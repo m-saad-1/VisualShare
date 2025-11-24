@@ -1,7 +1,0 @@
-{
-    "editor.formatOnSave": true,
-    "php-cs-fixer.enable": true,
-    "php-cs-fixer.executablePath": "php-cs-fixer",
-    "php-cs-fixer.rules": "@PSR12",
-    "editor.defaultFormatter": "junstyle.php-cs-fixer"
-}
