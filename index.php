@@ -5,157 +5,14 @@ require_once 'includes/config.php';
 $page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int)$_GET['page'] : 1;
 $items_per_page = 12; // Initial load count
 $offset = ($page - 1) * $items_per_page;
-	error_reporting(E_ALL);
-ini_set('display_errors', 1);
-
-if (
-    ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ajax'])) || 
-    (isset($_GET['ajax']) && $_GET['ajax'] === '1')
-) {
+error_reporting(E_ALL);
+ini_set('display_errors', 1); // Set error reporting for development
+// Handle AJAX requests for infinite scroll
+if (isset($_GET['ajax']) && $_GET['ajax'] === '1') {
     header('Content-Type: application/json');
-
-    try {
-        if ($_POST['ajax'] === 'like') {
-            $response = ['success' => false, 'message' => 'Invalid request', 'like_count' => 0];
-
-            if (empty($_SESSION['user_id'])) {
-                http_response_code(401);
-                $response['message'] = 'Authentication required';
-                echo json_encode($response);
-                exit;
-            }
-
-            $upload_id = filter_var($_POST['upload_id'] ?? 0, FILTER_VALIDATE_INT);
-            $action = ($_POST['action'] === 'like') ? 'like' : 'unlike';
-            $user_id = (int)$_SESSION['user_id'];
-
-            if (!$upload_id) {
-                http_response_code(400);
-                $response['message'] = 'Invalid content ID';
-                echo json_encode($response);
-                exit;
-            }
-
-            if ($conn->connect_error) {
-                http_response_code(500);
-                $response['message'] = 'Database connection failed';
-                echo json_encode($response);
-                exit;
-            }
-
-            $stmt = $conn->prepare("SELECT id FROM uploads WHERE id = ?");
-            $stmt->bind_param("i", $upload_id);
-            $stmt->execute();
-            $stmt->store_result();
-            if ($stmt->num_rows === 0) {
-                http_response_code(404);
-                $response['message'] = 'Content not found';
-                echo json_encode($response);
-                exit;
-            }
-            $stmt->close();
-
-            if ($action === 'like') {
-                $check = $conn->prepare("SELECT id FROM likes WHERE user_id=? AND upload_id=?");
-                $check->bind_param("ii", $user_id, $upload_id);
-                $check->execute();
-                $check->store_result();
-                if ($check->num_rows === 0) {
-                    $insert = $conn->prepare("INSERT INTO likes (user_id, upload_id) VALUES (?, ?)");
-                    $insert->bind_param("ii", $user_id, $upload_id);
-                    $insert->execute();
-                    $insert->close();
-                }
-                $check->close();
-            } else {
-                $delete = $conn->prepare("DELETE FROM likes WHERE user_id=? AND upload_id=?");
-                $delete->bind_param("ii", $user_id, $upload_id);
-                $delete->execute();
-                $delete->close();
-            }
-
-            $count_stmt = $conn->prepare("SELECT COUNT(*) FROM likes WHERE upload_id=?");
-            $count_stmt->bind_param("i", $upload_id);
-            $count_stmt->execute();
-            $count_stmt->bind_result($count);
-            $count_stmt->fetch();
-            $count_stmt->close();
-
-            $response = [
-                'success' => true,
-                'like_count' => $count,
-                'message' => ucfirst($action) . ' successful'
-            ];
-            echo json_encode($response);
-            exit;
-        } elseif ($_POST['ajax'] === 'save') {
-            $response = ['success' => false, 'message' => 'Invalid request', 'saved' => false];
-
-            if (empty($_SESSION['user_id'])) {
-                http_response_code(401);
-                $response['message'] = 'Authentication required';
-                echo json_encode($response);
-                exit;
-            }
-
-            $upload_id = filter_var($_POST['upload_id'] ?? 0, FILTER_VALIDATE_INT);
-            $user_id = (int)$_SESSION['user_id'];
-
-            if (!$upload_id) {
-                http_response_code(400);
-                $response['message'] = 'Invalid content ID';
-                echo json_encode($response);
-                exit;
-            }
-
-            if ($conn->connect_error) {
-                http_response_code(500);
-                $response['message'] = 'Database connection failed';
-                echo json_encode($response);
-                exit;
-            }
-
-            $stmt = $conn->prepare("SELECT id FROM uploads WHERE id = ?");
-            $stmt->bind_param("i", $upload_id);
-            $stmt->execute();
-            $stmt->store_result();
-            if ($stmt->num_rows === 0) {
-                http_response_code(404);
-                $response['message'] = 'Content not found';
-                echo json_encode($response);
-                exit;
-            }
-            $stmt->close();
-
-            $check = $conn->prepare("SELECT user_id FROM user_favorites WHERE user_id=? AND upload_id=?");
-            $check->bind_param("ii", $user_id, $upload_id);
-            $check->execute();
-            $check->store_result();
-
-            if ($check->num_rows === 0) {
-                $insert = $conn->prepare("INSERT INTO user_favorites (user_id, upload_id) VALUES (?, ?)");
-                $insert->bind_param("ii", $user_id, $upload_id);
-                $insert->execute();
-                $insert->close();
-                $response = ['success' => true, 'saved' => true, 'message' => 'Content saved successfully'];
-            } else {
-                $delete = $conn->prepare("DELETE FROM user_favorites WHERE user_id=? AND upload_id=?");
-                $delete->bind_param("ii", $user_id, $upload_id);
-                $delete->execute();
-                $delete->close();
-                $response = ['success' => true, 'saved' => false, 'message' => 'Content removed from saved items'];
-            }
-            $check->close();
-            echo json_encode($response);
-            exit;
-        }
-    } catch (Exception $e) {
-        http_response_code(500);
-        echo json_encode(['success' => false, 'message' => 'Server error: ' . $e->getMessage()]);
-        exit;
-    }
+    // The rest of the data fetching logic will be handled below
+    // and will exit with JSON at the end of the try block.
 }
-
 $search_query = isset($_GET['search']) ? trim($_GET['search']) : '';
 $current_user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 0;
 
@@ -200,10 +57,6 @@ try {
         array_push($params, $items_per_page, $offset);
         $types .= 'ii';
 
-<<<<<<< HEAD
-
-=======
->>>>>>> 17221d95d261719fb200adfa22987188281345e8
         $stmt = $conn->prepare($query);
         if ($stmt) {
             $stmt->bind_param($types, ...$params);
@@ -1565,7 +1418,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         action: wasLiked ? 'unlike' : 'like'
                     });
 
-                    const response = await fetch('index.php', {
+                    const response = await fetch('api.php', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/x-www-form-urlencoded',
@@ -1650,7 +1503,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         upload_id: uploadId
                     });
 
-                    const response = await fetch('index.php', {
+                    const response = await fetch('api.php', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/x-www-form-urlencoded',
