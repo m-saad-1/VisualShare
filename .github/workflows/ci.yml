@@ -51,3 +51,7 @@ jobs:
         protocol: ftps
         local-dir: "./"
         server-dir: "/htdocs/"
+        exclude: |
+          **/.git*
+          **/.git*/**
+          **/vendor/**
