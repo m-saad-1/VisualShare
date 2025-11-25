@@ -1107,3 +1107,4 @@ Stack trace:
 #1 {main}
   thrown in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 13
 [22-Nov-2025 22:12:37 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1829
+[25-Nov-2025 13:04:09 Europe/Berlin] PHP Warning:  Undefined variable $total_uploads in C:\xampp\htdocs\Content-upload - Copy\dashboard.php on line 1833

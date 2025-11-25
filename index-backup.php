@@ -5,158 +5,14 @@ require_once 'includes/config.php';
 $page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int)$_GET['page'] : 1;
 $items_per_page = 12; // Initial load count
 $offset = ($page - 1) * $items_per_page;
-
 error_reporting(E_ALL);
-ini_set('display_errors', 1);
-
-if (
-    ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ajax'])) ||
-    (isset($_GET['ajax']) && $_GET['ajax'] === '1')
-) {
+ini_set('display_errors', 1); // Set error reporting for development
+// Handle AJAX requests for infinite scroll
+if (isset($_GET['ajax']) && $_GET['ajax'] === '1') {
     header('Content-Type: application/json');
-
-    try {
-        if ($_POST['ajax'] === 'like') {
-            $response = ['success' => false, 'message' => 'Invalid request', 'like_count' => 0];
-
-            if (empty($_SESSION['user_id'])) {
-                http_response_code(401);
-                $response['message'] = 'Authentication required';
-                echo json_encode($response);
-                exit;
-            }
-
-            $upload_id = filter_var($_POST['upload_id'] ?? 0, FILTER_VALIDATE_INT);
-            $action = ($_POST['action'] === 'like') ? 'like' : 'unlike';
-            $user_id = (int)$_SESSION['user_id'];
-
-            if (!$upload_id) {
-                http_response_code(400);
-                $response['message'] = 'Invalid content ID';
-                echo json_encode($response);
-                exit;
-            }
-
-            if ($conn->connect_error) {
-                http_response_code(500);
-                $response['message'] = 'Database connection failed';
-                echo json_encode($response);
-                exit;
-            }
-
-            $stmt = $conn->prepare("SELECT id FROM uploads WHERE id = ?");
-            $stmt->bind_param("i", $upload_id);
-            $stmt->execute();
-            $stmt->store_result();
-            if ($stmt->num_rows === 0) {
-                http_response_code(404);
-                $response['message'] = 'Content not found';
-                echo json_encode($response);
-                exit;
-            }
-            $stmt->close();
-
-            if ($action === 'like') {
-                $check = $conn->prepare("SELECT id FROM likes WHERE user_id=? AND upload_id=?");
-                $check->bind_param("ii", $user_id, $upload_id);
-                $check->execute();
-                $check->store_result();
-                if ($check->num_rows === 0) {
-                    $insert = $conn->prepare("INSERT INTO likes (user_id, upload_id) VALUES (?, ?)");
-                    $insert->bind_param("ii", $user_id, $upload_id);
-                    $insert->execute();
-                    $insert->close();
-                }
-                $check->close();
-            } else {
-                $delete = $conn->prepare("DELETE FROM likes WHERE user_id=? AND upload_id=?");
-                $delete->bind_param("ii", $user_id, $upload_id);
-                $delete->execute();
-                $delete->close();
-            }
-
-            $count_stmt = $conn->prepare("SELECT COUNT(*) FROM likes WHERE upload_id=?");
-            $count_stmt->bind_param("i", $upload_id);
-            $count_stmt->execute();
-            $count_stmt->bind_result($count);
-            $count_stmt->fetch();
-            $count_stmt->close();
-
-            $response = [
-                'success' => true,
-                'like_count' => $count,
-                'message' => ucfirst($action) . ' successful'
-            ];
-            echo json_encode($response);
-            exit;
-        } elseif ($_POST['ajax'] === 'save') {
-            $response = ['success' => false, 'message' => 'Invalid request', 'saved' => false];
-
-            if (empty($_SESSION['user_id'])) {
-                http_response_code(401);
-                $response['message'] = 'Authentication required';
-                echo json_encode($response);
-                exit;
-            }
-
-            $upload_id = filter_var($_POST['upload_id'] ?? 0, FILTER_VALIDATE_INT);
-            $user_id = (int)$_SESSION['user_id'];
-
-            if (!$upload_id) {
-                http_response_code(400);
-                $response['message'] = 'Invalid content ID';
-                echo json_encode($response);
-                exit;
-            }
-
-            if ($conn->connect_error) {
-                http_response_code(500);
-                $response['message'] = 'Database connection failed';
-                echo json_encode($response);
-                exit;
-            }
-
-            $stmt = $conn->prepare("SELECT id FROM uploads WHERE id = ?");
-            $stmt->bind_param("i", $upload_id);
-            $stmt->execute();
-            $stmt->store_result();
-            if ($stmt->num_rows === 0) {
-                http_response_code(404);
-                $response['message'] = 'Content not found';
-                echo json_encode($response);
-                exit;
-            }
-            $stmt->close();
-
-            $check = $conn->prepare("SELECT user_id FROM user_favorites WHERE user_id=? AND upload_id=?");
-            $check->bind_param("ii", $user_id, $upload_id);
-            $check->execute();
-            $check->store_result();
-
-            if ($check->num_rows === 0) {
-                $insert = $conn->prepare("INSERT INTO user_favorites (user_id, upload_id) VALUES (?, ?)");
-                $insert->bind_param("ii", $user_id, $upload_id);
-                $insert->execute();
-                $insert->close();
-                $response = ['success' => true, 'saved' => true, 'message' => 'Content saved successfully'];
-            } else {
-                $delete = $conn->prepare("DELETE FROM user_favorites WHERE user_id=? AND upload_id=?");
-                $delete->bind_param("ii", $user_id, $upload_id);
-                $delete->execute();
-                $delete->close();
-                $response = ['success' => true, 'saved' => false, 'message' => 'Content removed from saved items'];
-            }
-            $check->close();
-            echo json_encode($response);
-            exit;
-        }
-    } catch (Exception $e) {
-        http_response_code(500);
-        echo json_encode(['success' => false, 'message' => 'Server error: ' . $e->getMessage()]);
-        exit;
-    }
+    // The rest of the data fetching logic will be handled below
+    // and will exit with JSON at the end of the try block.
 }
-
 $search_query = isset($_GET['search']) ? trim($_GET['search']) : '';
 $current_user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 0;
 
@@ -200,7 +56,6 @@ try {
         $query .= " GROUP BY uploads.id ORDER BY upload_date DESC LIMIT ? OFFSET ?";
         array_push($params, $items_per_page, $offset);
         $types .= 'ii';
-
 
         $stmt = $conn->prepare($query);
         if ($stmt) {
@@ -248,19 +103,19 @@ try {
     }
 
     // Get total count for pagination logic in JS
-    $count_query = "SELECT COUNT(DISTINCT uploads.id) as total 
-                   FROM uploads 
+    $count_query = "SELECT COUNT(DISTINCT uploads.id) as total
+                   FROM uploads
                    JOIN users ON uploads.user_id = users.id";
     if ($tables_exist && !empty($search_query)) {
         $count_query .= " LEFT JOIN upload_tags ut ON ut.upload_id = uploads.id
                          LEFT JOIN tags t ON t.id = ut.tag_id
-                         WHERE (uploads.title LIKE ? 
-                         OR uploads.description LIKE ? 
+                         WHERE (uploads.title LIKE ?
+                         OR uploads.description LIKE ?
                          OR users.username LIKE ?
                          OR t.name LIKE ?)";
     } elseif (!empty($search_query)) {
-        $count_query .= " WHERE (uploads.title LIKE ? 
-                         OR uploads.description LIKE ? 
+        $count_query .= " WHERE (uploads.title LIKE ?
+                         OR uploads.description LIKE ?
                          OR users.username LIKE ?)";
     }
 
@@ -276,6 +131,7 @@ try {
 } catch (Exception $e) {
     die("Database error: " . $e->getMessage());
 }
+
 ?>
 
 <!-- Loading overlay -->
@@ -329,6 +185,7 @@ try {
     </div>
 
     <div class="masonry-grid" id="masonryGrid" aria-live="polite" aria-relevant="additions">
+        <div class="grid-sizer"></div>
         <?php if (count($items) > 0) : ?>
             <?php foreach ($items as $row) : ?>
                 <?php
@@ -385,13 +242,13 @@ try {
                                             $thumbnail_height = 360;
                                         }
                                         ?>
-                                        <img src="<?php echo $thumbnail_to_show; ?>?quality=70"
+                                        <img src="<?php echo $thumbnail_to_show; ?>?quality=low"
                                              alt="Thumbnail for <?php echo htmlspecialchars($row['title']); ?>"
                                              loading="lazy"
                                              decoding="async"
                                              <?php if ($thumbnail_width && $thumbnail_height) : ?>
-                                             width="<?php echo $thumbnail_width; ?>"
-                                             height="<?php echo $thumbnail_height; ?>"
+                                             width="320"
+                                             height="180"
                                              <?php endif; ?>
                                              onload="this.classList.add('loaded'); this.previousElementSibling.style.opacity='0';">
                                     <?php else : ?>
@@ -418,16 +275,15 @@ try {
                                 }
                                 ?>
                                 <div class="image-aspect-ratio-container" style="<?php echo $aspect_ratio_style; ?>">
-                                    <div class="image-skeleton"></div>
-                                    <img src="<?php echo $display_path; ?>?quality=70" 
+                                    <img src="<?php echo $display_path; ?>?quality=low"
                                          alt="<?php echo htmlspecialchars($row['title']); ?>"
                                          loading="lazy"
                                          decoding="async"
                                          <?php if ($image_size && $image_size[0] > 0 && $image_size[1] > 0) : ?>
-                                         width="<?php echo $image_size[0]; ?>"
-                                         height="<?php echo $image_size[1]; ?>"
+                                         width="320"
+                                         height="<?php echo round(320 * ($image_size[1] / $image_size[0])); ?>"
                                          <?php endif; ?>
-                                         onload="this.classList.add('loaded'); this.previousElementSibling.style.opacity = '0';">
+                                         class="lazy-image">
                                 </div>
                             <?php endif; ?>
                         <?php else : ?>
@@ -481,12 +337,18 @@ try {
             <p class="no-content">No content found. Try adjusting your search or <a href="upload.php">upload something</a>!</p>
         <?php endif; ?>
     </div>
-    <div id="loader" class="infinite-scroll-loader" style="display: none;">
+    <div id="loader" class="infinite-scroll-loader" style="display: none;" aria-label="Loading more content">
         <div class="loader">
             <span></span><span></span><span></span><span></span><span></span><span></span>
         </div>
     </div>
 
+    <div id="load-more-container" class="load-more-container" style="display: none;">
+        <p id="load-error-message" style="display: none; color: #dc3545; margin-bottom: 10px;"></p>
+        <button id="load-more-btn" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Load More
+        </button>
+    </div>
 </div>
 
 <style>
@@ -718,23 +580,32 @@ try {
     
     /* Pinterest-Style Masonry Grid */
     .masonry-grid {
-        column-count: 4;
-        column-gap: 20px;
         margin: 0 auto;
         max-width: 1400px;
+        position: relative; /* Required for absolute positioning of items */
+    }
+
+    /* Gutter for masonry items */
+    .masonry-grid:after {
+        content: '';
+        display: block;
+        clear: both;
+    }
+
+    .grid-sizer,
+    .masonry-item {
+        width: 23%; /* Default for 4 columns */
     }
 
     .masonry-item {
-        display: inline-block;
-        width: 100%;
         margin-bottom: 20px;
-        break-inside: avoid;
-        position: relative;
         border-radius: 8px;
         overflow: hidden;
         background: white;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         transition: transform 0.3s ease, box-shadow 0.3s ease;
+        /* Removed break-inside and display: inline-block */
+        /* Masonry.js will handle positioning */
     }
 
     .masonry-item:hover {
@@ -975,6 +846,24 @@ try {
         object-fit: cover;
     }
 
+    .load-more-container {
+        text-align: center;
+        padding: 20px;
+    }
+
+    .load-more-container .btn-primary {
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        font-size: 1rem;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+    .load-more-container .btn-primary:hover {
+        background-color: var(--primary-light);
+    }
 /* Modal Styles */
 .modal {
     display: none; /* Hidden by default */
@@ -1068,18 +957,24 @@ try {
 
     /* Responsive adjustments */
     @media (max-width: 1200px) {
-        .masonry-grid {
-            column-count: 3;
+        .grid-sizer,
+        .masonry-item {
+            width: 31%; /* 3 columns */
         }
     }
 
     @media (max-width: 900px) {
-        .masonry-grid {
-            column-count: 2;
+        .grid-sizer,
+        .masonry-item {
+            width: 48%; /* 2 columns */
         }
 
         .masonry-overlay {
             padding: 12px;
+        }
+
+        .masonry-item {
+            margin-bottom: 15px;
         }
 
         .masonry-overlay h3 {
@@ -1133,14 +1028,8 @@ try {
     }
 
     @media (max-width: 768px) {
-        .masonry-grid {
-            column-count: 2; /* Adjust column count for smaller screens */
-            column-gap: 10px; /* Reduce spacing between image cards */
-        }
-
         .masonry-item {
             margin-bottom: 10px; /* Reduce spacing between image cards */
-        }
 
         .save-btn {
             display: none; /* Hide save button */
@@ -1207,8 +1096,9 @@ try {
     }
 
     @media (max-width: 400px) {
-        .masonry-grid {
-            column-count: 1;
+        .grid-sizer,
+        .masonry-item {
+            width: 98%; /* 1 column */
         }
 
         .search-section {
@@ -1238,14 +1128,63 @@ try {
 </style>
 
 <script>
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', function() {
     // --- Page Load, Infinite Scroll, and Actions ---
     let isLoading = false;
     let currentPage = <?php echo $page; ?>;
-    let totalPages = <?php echo $total_pages ?? 1; ?>;
     const container = document.querySelector('.container');
+    const lazyImages = document.querySelectorAll('img.lazy-image');
+    const loaderEl = document.getElementById('loader');
+    const loadMoreContainer = document.getElementById('load-more-container');
+    const grid = document.getElementById('masonryGrid');
+    let msnry;
 
-    // Hide loading overlay when page is fully loaded
+    // Initialize Masonry after images are loaded
+    imagesLoaded(grid, function () {
+        msnry = new Masonry(grid, { // ... Masonry options
+            itemSelector: '.masonry-item', columnWidth: '.grid-sizer', gutter: 20, percentPosition: true, transitionDuration: '0.4s'
+        });
+    });
+
+    // --- Robust Lazy Loading with IntersectionObserver Fallback ---
+    if ('loading' in HTMLImageElement.prototype) {
+        // Native lazy loading is supported.
+        // The browser will handle it. We just need to ensure images fade in.
+        lazyImages.forEach(img => {
+            // Use a temporary image to detect when the real one has loaded
+            const tempImg = new Image();
+            tempImg.src = img.src;
+            tempImg.onload = () => {
+                img.classList.add('loaded');
+                if (msnry) {
+                    imagesLoaded(img, () => msnry.layout());
+                }
+            };
+        });
+    } else {
+        // Fallback to IntersectionObserver
+        const lazyLoad = (target) => {
+            const io = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const img = entry.target;
+                        // The src is already the high-quality one, we just need to load it.
+                        img.src = img.src; // Re-assigning src triggers load
+                        img.onload = () => {
+                            img.classList.add('loaded');
+                            if (msnry) {
+                                imagesLoaded(img, () => msnry.layout());
+                            }
+                        };
+                        observer.unobserve(img);
+                    }
+                });
+            });
+            io.observe(target);
+        };
+        lazyImages.forEach(lazyLoad);
+    }
+    
     const handlePageLoad = () => {
         const loadingOverlay = document.getElementById('loading-overlay');
         if (loadingOverlay) {
@@ -1282,23 +1221,28 @@ document.addEventListener('DOMContentLoaded', function () {
     // --- Infinite Scroll ---
     const observer = new IntersectionObserver(
         (entries) => {
-            if (entries[0].isIntersecting && !isLoading && currentPage < totalPages) {
-                // fetchMoreItems(); // This can be re-enabled if you want infinite scroll
+            if (entries[0].isIntersecting && !isLoading) {
+                fetchMoreItems();
             }
         }, { rootMargin: "0px 0px 400px 0px" }
     );
-
-    const loaderEl = document.getElementById('loader');
+    
     if (loaderEl) {
         observer.observe(loaderEl);
     }
 
-    // This function is ready for when you want to enable infinite scroll
+    const loadMoreBtn = document.getElementById('load-more-btn');
+    if (loadMoreBtn) {
+        loadMoreBtn.addEventListener('click', () => {
+            loadMoreContainer.style.display = 'none';
+            fetchMoreItems();
+        });
+    }
+
     async function fetchMoreItems() {
         const params = new URLSearchParams(window.location.search);
         isLoading = true;
         currentPage++;
-        loaderEl.style.display = 'block';
 
         params.set('page', currentPage);
         params.set('ajax', '1');
@@ -1306,40 +1250,52 @@ document.addEventListener('DOMContentLoaded', function () {
         let data;
         try {
             const response = await fetch(`index.php?${params.toString()}`);
+            loaderEl.style.display = 'block';
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             const data = await response.json();
 
             if (data && data.success && data.items.length > 0) {
-                const grid = document.getElementById("masonryGrid");
                 const fragment = document.createDocumentFragment();
+                const newItems = [];
                 data.items.forEach(item => {
                     const newItem = createMasonryItem(item);
                     fragment.appendChild(newItem);
+                    newItems.push(newItem);
                 });
                 grid.appendChild(fragment);
+
+                // Use imagesLoaded for new items, then append to Masonry
+                imagesLoaded(newItems, function() {
+                    msnry.appended(newItems);
+                });
                 initLikeButtons();
-                initSaveButtons(); // Re-initialize for new items
+                initSaveButtons();
             }
 
             if (!data.has_more) {
                 observer.unobserve(loaderEl);
-                loaderEl.style.display = 'none';
             }
 
         } catch (error) {
             console.error("Failed to fetch more items:", error);
-            // Optionally show an error message
+            // Show error message and load more button
+            const errorMessageEl = document.getElementById('load-error-message');
+            if (errorMessageEl) {
+                errorMessageEl.textContent = 'Failed to load content. Please try again.';
+                errorMessageEl.style.display = 'block';
+            }
+            if (loadMoreContainer) {
+                loadMoreContainer.style.display = 'block';
+            }
+            observer.unobserve(loaderEl); // Stop observing on error
         } finally {
             isLoading = false;
-            if (currentPage >= totalPages || (data && !data.has_more)) {
-                loaderEl.style.display = 'none';
-            }
+            loaderEl.style.display = 'none';
         }
     }
 
-    // This function is ready for when you want to enable infinite scroll
     function createMasonryItem(row) {
         const file_ext = (row.filename.split('.').pop() || '').toLowerCase();
         const is_video = ['mp4', 'mov', 'avi', 'wmv', 'webm'].includes(file_ext);
@@ -1383,10 +1339,19 @@ document.addEventListener('DOMContentLoaded', function () {
                 </div>`;
         } else {
             mediaHtml = `
-                <div class="image-aspect-ratio-container" style="padding-top: 100%;"> 
+                <div class="image-aspect-ratio-container" style="padding-top: 100%;">
                     <div class="image-skeleton"></div>
-                    <img src="${display_path}?quality=70" alt="${row.title}" loading="lazy" decoding="async" onload="this.classList.add('loaded'); this.previousElementSibling.style.opacity = '0';">
-                </div>`; // Default aspect ratio
+                    <img src="${display_path}?quality=low" alt="${row.title}" loading="lazy" decoding="async" class="lazy-image" onload="
+                        this.classList.add('loaded'); 
+                        this.previousElementSibling.style.opacity = '0'; // Fade out skeleton
+                        // Set aspect ratio on the container after image loads to help Masonry
+                        const aspectRatio = this.naturalHeight / this.naturalWidth;
+                        if (aspectRatio) {
+                            this.parentElement.style.paddingTop = (aspectRatio * 100) + '%';
+                        }
+                        if (msnry) { msnry.layout(); }
+                    " style="opacity:0;">
+                </div>`;
         }
 
         itemDiv.innerHTML = `
@@ -1453,7 +1418,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         action: wasLiked ? 'unlike' : 'like'
                     });
 
-                    const response = await fetch('index.php', {
+                    const response = await fetch('api.php', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/x-www-form-urlencoded',
@@ -1538,7 +1503,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         upload_id: uploadId
                     });
 
-                    const response = await fetch('index.php', {
+                    const response = await fetch('api.php', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/x-www-form-urlencoded',
@@ -1650,6 +1615,10 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 </script>
+
+<!-- Masonry & ImagesLoaded CDN -->
+<script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.min.js"></script>
+<script src="https://unpkg.com/imagesloaded@5/imagesloaded.pkgd.min.js"></script>
 
 <?php require_once 'includes/footer.php'; ?>
 
