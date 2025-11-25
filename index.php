@@ -103,20 +103,20 @@ try {
     }
 
     // Get total count for pagination logic in JS
-    $count_query = "SELECT COUNT(DISTINCT uploads.id) as total \
-                   FROM uploads \
+    $count_query = "SELECT COUNT(DISTINCT uploads.id) as total
+                   FROM uploads
                    JOIN users ON uploads.user_id = users.id";
     if ($tables_exist && !empty($search_query)) {
-        $count_query .= " LEFT JOIN upload_tags ut ON ut.upload_id = uploads.id\
-                         LEFT JOIN tags t ON t.id = ut.tag_id\
-                         WHERE (uploads.title LIKE ? \
-                         OR uploads.description LIKE ? \
-                         OR users.username LIKE ?\
+        $count_query .= " LEFT JOIN upload_tags ut ON ut.upload_id = uploads.id
+                         LEFT JOIN tags t ON t.id = ut.tag_id
+                         WHERE (uploads.title LIKE ?
+                         OR uploads.description LIKE ?
+                         OR users.username LIKE ?
                          OR t.name LIKE ?)";
     } elseif (!empty($search_query)) {
-        $count_query .= " WHERE (uploads.title LIKE ? \
-                         OR uploads.description LIKE ? \
-                         OR users.username LIKE ?}";
+        $count_query .= " WHERE (uploads.title LIKE ?
+                         OR uploads.description LIKE ?
+                         OR users.username LIKE ?)";
     }
 
     $count_stmt = $conn->prepare($count_query);
@@ -242,13 +242,13 @@ try {
                                             $thumbnail_height = 360;
                                         }
                                         ?>
-                                        <img src="<?php echo $thumbnail_to_show; ?>?quality=70"
+                                        <img src="<?php echo $thumbnail_to_show; ?>?quality=low"
                                              alt="Thumbnail for <?php echo htmlspecialchars($row['title']); ?>"
                                              loading="lazy"
                                              decoding="async"
                                              <?php if ($thumbnail_width && $thumbnail_height) : ?>
-                                             width="<?php echo $thumbnail_width; ?>"
-                                             height="<?php echo $thumbnail_height; ?>"
+                                             width="320"
+                                             height="180"
                                              <?php endif; ?>
                                              onload="this.classList.add('loaded'); this.previousElementSibling.style.opacity='0';">
                                     <?php else : ?>
@@ -275,13 +275,13 @@ try {
                                 }
                                 ?>
                                 <div class="image-aspect-ratio-container" style="<?php echo $aspect_ratio_style; ?>">
-                                    <img src="<?php echo $display_path; ?>?quality=high" 
+                                    <img src="<?php echo $display_path; ?>?quality=low"
                                          alt="<?php echo htmlspecialchars($row['title']); ?>"
                                          loading="lazy"
                                          decoding="async"
                                          <?php if ($image_size && $image_size[0] > 0 && $image_size[1] > 0) : ?>
-                                         width="<?php echo $image_size[0]; ?>"
-                                         height="<?php echo $image_size[1]; ?>"
+                                         width="320"
+                                         height="<?php echo round(320 * ($image_size[1] / $image_size[0])); ?>"
                                          <?php endif; ?>
                                          class="lazy-image">
                                 </div>
@@ -1341,16 +1341,16 @@ document.addEventListener('DOMContentLoaded', function() {
             mediaHtml = `
                 <div class="image-aspect-ratio-container" style="padding-top: 100%;">
                     <div class="image-skeleton"></div>
-                    <img src="${display_path}?quality=70" alt="${row.title}" loading="lazy" decoding="async" onload="
+                    <img src="${display_path}?quality=low" alt="${row.title}" loading="lazy" decoding="async" class="lazy-image" onload="
                         this.classList.add('loaded'); 
-                        this.previousElementSibling.style.opacity = '0';
+                        this.previousElementSibling.style.opacity = '0'; // Fade out skeleton
                         // Set aspect ratio on the container after image loads to help Masonry
                         const aspectRatio = this.naturalHeight / this.naturalWidth;
                         if (aspectRatio) {
                             this.parentElement.style.paddingTop = (aspectRatio * 100) + '%';
                         }
                         if (msnry) { msnry.layout(); }
-                    ">
+                    " style="opacity:0;">
                 </div>`;
         }
 

@@ -1,2 +1,2 @@
-# Composer dependencies
-/vendor/
+﻿php_errors.log
+vendor/

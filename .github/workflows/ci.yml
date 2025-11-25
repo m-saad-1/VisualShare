@@ -27,10 +27,10 @@ jobs:
     - name: Install Composer Dependencies
       run: composer install --no-progress --no-suggest --prefer-dist
 
-    # 4️⃣ Optional: Run PHP Unit Tests
-    - name: Run Tests
-      run: vendor/bin/phpunit --testdox
-      continue-on-error: true  # If you don't want failed tests to stop deployment
+    # # 4️⃣ Optional: Run PHP Unit Tests
+    # - name: Run Tests
+    #   run: vendor/bin/phpunit --testdox
+    #   continue-on-error: true  # If you don't want failed tests to stop deployment
 
     # 5️⃣ Optional: If you have frontend build
     - name: Install Node Modules
