@@ -48,7 +48,7 @@ jobs:
         server: ${{ secrets.FTP_SERVER }}
         username: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
-        protocol: ftps
+        protocol: ftp
         local-dir: "./"
         server-dir: "/htdocs/"
         timeout: 300000
@@ -57,3 +57,12 @@ jobs:
           **/.git*
           **/.git*/**
           **/vendor/**
+          **/node_modules/**
+          .github/**
+          .gitignore
+          phpunit.xml
+          phpunit.xml.dist
+          phpstan.neon.dist
+          .phpcs.xml.dist
+          composer.json
+          composer.lock
